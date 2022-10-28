@@ -1,8 +1,10 @@
 # VendorVert
+---
 
 ### Repositorio para el proyecto de la asignatura "Cloud Computing: Fundamentos e Infraestructuras" del Máster en Ingeniería Informática de la UGR.
 
 Sistema de ayuda a la toma de decisiones para pequeños negocios.
+
 ***
 
 ## Hito 0. Introducción.
