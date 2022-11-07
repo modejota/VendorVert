@@ -1,0 +1,28 @@
+{
+  "name": "vendorvert",
+  "version": "0.0.2",
+  "description": "Sistema de ayuda a la toma de decisiones para pequeños negocios.",
+  "scripts": {
+      "check": "tsc --noEmit",
+      "build": "tsc --build",
+      "clean": "tsc --build --clean"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/modejota/vendorvert.git"
+  },
+  "keywords": [],
+  "author": {
+      "name": "José Alberto Gómez García",
+      "email": "modej@correo.ugr.es"
+  },
+  "license": "GPL-3.0",
+  "bugs": {
+      "url": "https://github.com/modejota/vendorvert/issues",
+      "email": "modej@correo.ugr.es"
+  },
+
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
