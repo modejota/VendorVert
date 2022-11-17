@@ -33,33 +33,31 @@ export class Product {
 
         if (!nombre) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto} sin nombre `);
-
-        } else if (nombre.length < Constants.LON_NOMBRE_MIN) {
+        } 
+        if (nombre.length < Constants.LON_NOMBRE_MIN) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto} con un nombre demasido corto `);
-
-        } else if (nombre.length > Constants.LON_NOMBRE_MAX) {
+        } 
+        if (nombre.length > Constants.LON_NOMBRE_MAX) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto} con un nombre demasido largo `);
-
         }
         this._nombre = nombre;
 
         if(!marca) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto} y nombre ${nombre} sin marca `);
-
-        } else if (marca.length < Constants.LON_MARCA_MIN) {
+        } 
+        if (marca.length < Constants.LON_MARCA_MIN) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto} y nombre ${nombre} con una marca muy corta `);
-
-        } else if (marca.length > Constants.LON_MARCA_MAX) {
+        }
+        if (marca.length > Constants.LON_MARCA_MAX) {
             throw new ProductError(` Se intentó crear un producto con ID "${id_producto} y nombre ${nombre} con una marca muy larga`);
-
         }
         this._marca = marca;
 
         if(!PVP) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto}, nombre ${nombre}, marca ${marca} sin PVP `);
-        } else if(PVP <= Constants.CANTIDAD_INVALIDA) {
+        } 
+        if(PVP <= Constants.CANTIDAD_INVALIDA) {
             throw new ProductError(` Se intentó crear un producto con ID ${id_producto}, nombre ${nombre}, marca ${marca} y PVP inválido `);
-        
         }
         this._PVP = PVP;
 

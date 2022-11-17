@@ -69,26 +69,25 @@ export class Storage {
 
     /**
      * Método para actualizar un producto presente en el almacen
-     * @param ID Producto con los datos a modificarse
+     * @param product Producto con los datos a modificarse
      * @param new_c Nuevo valor de la cantidad en el producto
      */
-         public actualizar_producto(product: Product, new_c: number) {
-            let ID = product.id_producto
-            if (ID <= Constants.ID_INVALIDO) 
-                throw new StorageError( ` Se intentó actualizar la cantidad de un producto con ID ${ID} inválido `)
-            
-            if (this._inventario.has(ID)) {
-                let producto = this._inventario.get(ID)?.[0]
-                if (new_c >= Constants.CANTIDAD_INVALIDA)
-                this._inventario.set(ID, [product, new_c])
-            else    
-                this._inventario.set(ID, [product,Constants.CANTIDAD_INVALIDA])
-            }
-             
-            else 
-                throw new StorageError( `Se intentó actualizar la cantidad del producto con ID ${ID} no presente en el almacén `)
+    public actualizar_producto(product: Product, new_c: number) {
+        let ID = product.id_producto
+        if (ID <= Constants.ID_INVALIDO) 
+            throw new StorageError( ` Se intentó actualizar la cantidad de un producto con ID ${ID} inválido `)
         
+        if (this._inventario.has(ID)) {
+            let producto = this._inventario.get(ID)?.[0]
+            if (new_c >= Constants.CANTIDAD_INVALIDA)
+            this._inventario.set(ID, [product, new_c])
+        else    
+            this._inventario.set(ID, [product,Constants.CANTIDAD_INVALIDA])
         }
+            
+        else 
+            throw new StorageError( `Se intentó actualizar la cantidad del producto con ID ${ID} no presente en el almacén `)
+    }
 
     /**
      * Método para actualizar la cantidad de la que se dispone de un determinado producto en el almacén
@@ -112,7 +111,6 @@ export class Storage {
         } 
         else 
             throw new StorageError( `Se intentó actualizar la cantidad del producto con ID ${ID} no presente en el almacén `)
-
     }
 
     /**
@@ -127,8 +125,8 @@ export class Storage {
      * Método para obtener todos los productos del almacen
      * @returns Método para obtener todos los productos del almacen
      */
-         public get inventario() {
-            return this._inventario
-        }
+    public get inventario() {
+        return this._inventario
+    }
 
 }

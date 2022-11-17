@@ -35,7 +35,6 @@ export class Bill {
      */
     public aniadir_producto(producto: Product, cantidad = 0) {
         let key = producto.id_producto
-
         if (cantidad < Constants.CANTIDAD_INVALIDA) 
             throw new BillError(` Se intentó vender un producto con ID ${key} y cantidad ${cantidad} no válida `)
 
@@ -53,7 +52,6 @@ export class Bill {
     public obtener_producto(ID: number) {
         if (ID <= Constants.ID_INVALIDO)
             throw new BillError(` Se intentó obtener un producto con ID ${ID} inválido `)
-        
         if (this._productos.has(ID))
             return this._productos.get(ID)
         else
@@ -67,7 +65,6 @@ export class Bill {
     public eliminar_producto(ID: number) {
         if (ID <= Constants.ID_INVALIDO)
             throw new BillError(` Se intentó eliminar un producto con ID ${ID} inválido `)
-    
         if (this._productos.has(ID))
             this._productos.delete(ID)
         else
@@ -82,17 +79,14 @@ export class Bill {
     public actualizar_cantidad_producto(ID: number, new_c: number) {
         if (ID <= Constants.ID_INVALIDO)
             throw new BillError(` Se intentó acceder un producto con ID ${ID} inválido `)
-        
         if (this._productos.has(ID)) {
             let producto = this._productos.get(ID)?.[0]
             if (new_c >= Constants.CANTIDAD_INVALIDA)
                 this._productos.set(ID, [producto as Product, new_c])
             else
                 this._productos.set(ID, [producto as Product, Constants.CANTIDAD_INVALIDA])
-
         } else 
             throw new BillError( `Se intentó acceder a un producto con ID ${ID} no presente en la factura `)
-        
     }
 
     /**
@@ -104,7 +98,6 @@ export class Bill {
         let ID = product.id_producto
         if (ID <= Constants.ID_INVALIDO)
             throw new BillError(` Se intentó acceder un producto con ID ${ID} inválido `)
-        
         if (this._productos.has(ID)) {
             if (new_c >= Constants.CANTIDAD_INVALIDA)
                 this._productos.set(ID, [product, new_c])
@@ -112,7 +105,6 @@ export class Bill {
                 this._productos.set(ID, [product,Constants.CANTIDAD_INVALIDA])
         } else 
             throw new BillError( `Se intentó acceder a un producto con ID ${ID} no presente en la factura `)
-        
     }
 
     /**
