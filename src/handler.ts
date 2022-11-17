@@ -252,7 +252,6 @@ class Handler {
      * @param new_c Nueva cantidad del producto 
      */
     public actualizar_producto_factura(ID_factura: number, producto:Product,new_c:number) {
-        let ID_producto = producto.id_producto
         if (!this._facturas.has(ID_factura)) {
             this._last_err_message = `Se intentó eliminar un producto de una factura con ID ${ID_factura} no existente`
             throw new HandlerError(this._last_err_message)
