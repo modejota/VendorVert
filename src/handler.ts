@@ -1,11 +1,12 @@
-import { Product } from "./models/product";
 import { Bill } from "./models/bill";
+import { Storage } from "./models/storage";
+import { Product } from "./models/product";
 import { BillError } from "./errors/bill_error";
-import { StorageError } from "./errors/storage_error";
 import { Constants } from "./constants/constants";
+import { ProductType } from "./models/product_type";
+import { StorageError } from "./errors/storage_error";
 import { HandlerError } from "./errors/handler_error";
 import { ProductError } from "./errors/product_error";
-import { ProductType } from "./models/product_type";
 
 class Handler {
     private _existencias: Storage; 
@@ -339,7 +340,7 @@ class Handler {
      * @returns Productos presentes en el almacen
      */
     public get_all_productos_almacen() {
-        return this._existencias.inventario
+        return this._existencias.inventario;
     }
 
 }
