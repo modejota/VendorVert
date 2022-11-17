@@ -5,13 +5,16 @@
   "scripts": {
     "check": "tsc --noEmit",
     "build": "tsc --build",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "test" : "jest --detectOpenHandles",
+    "coverage": "jest --detectOpenHandles --coverage --no-cache",
+    "postclean": "rm -rf dist && rm -rf docs/coverage"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/modejota/vendorvert.git"
   },
-  "keywords": [],
+  "keywords": ["cloud", "computing", "ugr", "master"],
   "author": {
     "name": "José Alberto Gómez García",
     "email": "modej@correo.ugr.es"
