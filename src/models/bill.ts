@@ -10,7 +10,6 @@ import { Constants } from "../constants/constants";
 export class Bill {
     private _productos: Map<number,[_producto: Product, cantidad: number]>;
     private _fecha: Date;
-    //private _comprador: Client;
     
     /**
      * Constructor del objeto ventas
