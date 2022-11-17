@@ -7,11 +7,13 @@ import { ProductType } from "./models/product_type";
 import { StorageError } from "./errors/storage_error";
 import { HandlerError } from "./errors/handler_error";
 import { ProductError } from "./errors/product_error";
+// Faltaría añadir a los clientes, pero eso lo haremos más adelante
 
 class Handler {
     private _existencias: Storage; 
-    private _facturas: Map<number, Bill> 
+    private _facturas: Map<number, Bill>; 
     private _last_err_message: string;
+    //private _clients: Map<number, Client>;
 
     /**
      * Constructor del objeto manejador
