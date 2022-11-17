@@ -95,7 +95,6 @@ class Handler {
      * @param cantidad Nueva cantidad del producto
      */
     public actualizar_producto_almacen(producto: Product, cantidad: number) {
-        let ID = producto.id_producto
         try {
             this._existencias.actualizar_producto(producto,cantidad)
         } catch (exception) {
