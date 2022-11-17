@@ -6,7 +6,6 @@ import { Constants } from "./constants/constants";
 import { HandlerError } from "./errors/handler_error";
 import { ProductError } from "./errors/product_error";
 import { ProductType } from "./models/product_type";
-// Ordenar imports que si no me da el toc
 
 class Handler {
     private _existencias: Storage; 
