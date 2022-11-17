@@ -76,15 +76,12 @@ export class Storage {
         let ID = product.id_producto
         if (ID <= Constants.ID_INVALIDO) 
             throw new StorageError( ` Se intentó actualizar la cantidad de un producto con ID ${ID} inválido `)
-        
         if (this._inventario.has(ID)) {
-            let producto = this._inventario.get(ID)?.[0]
             if (new_c >= Constants.CANTIDAD_INVALIDA)
             this._inventario.set(ID, [product, new_c])
         else    
             this._inventario.set(ID, [product,Constants.CANTIDAD_INVALIDA])
         }
-            
         else 
             throw new StorageError( `Se intentó actualizar la cantidad del producto con ID ${ID} no presente en el almacén `)
     }
