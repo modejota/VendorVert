@@ -17,4 +17,8 @@ La documentación de este hito se encuentra en [este directorio](docs/hito1). En
 
 En [este documento](docs/hito1/1_primeras_decisiones.md) se justifican las primeras decisiones que debemos tomar para el desarrollo del proyecto, como son el lenguaje de programación, el entorno de ejecución, el gestor de dependencias, y las primeras clases a crear. 
 
+## Hito 2. Tests
+
+La documentación de este hito se encuentra en [este fichero](docs/hito2/2_framework_tests.md). En él se describe la justificación del framework de tests, así como la biblioteca de aserciones, que se van a usar para el proyecto. Se detalla también la instalación y configuración de ambos, así como la creación de los primeros tests.
+
 :construction: **En construcción conforme avance la asignatura** :construction:
