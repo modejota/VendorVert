@@ -6,8 +6,8 @@
     "check": "tsc --noEmit",
     "build": "tsc --build",
     "clean": "tsc --build --clean",
-    "test" : "jest --detectOpenHandles",
-    "coverage": "jest --detectOpenHandles --coverage --no-cache",
+    "test" : "jest",
+    "coverage": "jest --coverage --no-cache",
     "postclean": "rm -rf dist && rm -rf docs/coverage"
   },
   "repository": {
