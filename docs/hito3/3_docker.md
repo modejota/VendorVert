@@ -6,6 +6,12 @@ Para poder hacer uso de Docker en WSL2, deberemos instalarlo en el sistema opera
 
 Una guía más detallada de la instalación de Docker en WSL2 se puede encontrar en el siguiente [enlace](https://docs.docker.com/desktop/windows/wsl/).
 
-## Creación de una imagen Docker
+## Elección de contenedor base y creación de una imagen Docker
 
-Para crear una imagen Docker, deberemos crear un fichero Dockerfile que contenga las instrucciones necesarias para crear dicha imagen. 
+Para crear una imagen Docker, deberemos crear un fichero Dockerfile que contenga las instrucciones necesarias para crear dicha imagen.
+
+En primer lugar, deberemos elegir una imagen base, sobre la que se construirá la nuestra. 
+
+## Publicación de una imagen Docker en DockerHub. Automatización con GitHub Actions
+
+## Github Container Registry
