@@ -2,10 +2,12 @@ name: Update container published in DockerHub.
 
 on:
   push:
-    path:
+    paths:
       - 'Dockerfile'
       - 'package.json'
       - 'package-lock.json'
+    branches:
+      - master
 
 jobs:
   push_to_registries:
