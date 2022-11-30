@@ -11,7 +11,7 @@ USER node
 COPY package*.json ./
 
 # Install dependencies (CI = Continuous Integration)
-RUN npm ci 
+RUN npm ci && npm cache clean --force
 
 # Container for tests. Move to that directory
 WORKDIR /app/test
