@@ -15,7 +15,3 @@ En previsión de que en hitos posteriores se vaya a usar Docker Compose, procede
 Para crear una imagen Docker, deberemos crear un fichero Dockerfile que contenga las instrucciones necesarias para crear dicha imagen.
 
 En primer lugar, deberemos elegir una imagen base, sobre la que se construirá la nuestra. 
-
-## Publicación de una imagen Docker en DockerHub. Automatización con GitHub Actions
-
-## Github Container Registry
