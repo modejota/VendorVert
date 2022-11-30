@@ -1,6 +1,6 @@
 {
   "name": "vendorvert",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Sistema de ayuda a la toma de decisiones para pequeños negocios.",
   "scripts": {
     "check": "tsc --noEmit",
