@@ -1,8 +1,7 @@
-FROM node:18-alpine
-LABEL version="1.0" maintainer="modej@correo.ugr.es"
+FROM alpine:latest  
 
-# Create node_modules directory and set permissions
-RUN mkdir /node_modules && chown node /node_modules
+# Create node user and install node and npm. Create directory for packages and set permissions
+RUN adduser -S node && apk add --no-cache --update nodejs npm && mkdir /node_modules && chown node /node_modules
 
 # Change to node user. Avoid using root user
 USER node
