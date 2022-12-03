@@ -1,10 +1,12 @@
 name: Update Docker Hub README
+
 on:
-  push:
-    paths:
-      - README.md
+  pull_request:
     branches:
-      - master
+      - main
+    types: [closed]
+    paths:
+      - 'README.md'
 
 jobs:
   dockerHubDescription:
