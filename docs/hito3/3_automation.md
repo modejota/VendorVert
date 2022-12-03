@@ -8,7 +8,12 @@ Para automatizar la publicación de la imagen en DockerHub y Github Container Re
 
 A continuación se destacan algunos puntos importantes del fichero de configuración.
 
-- Se especifica que la acción se ejecute cuando se haga un push en la rama master y cuando se modifiquen los ficheros Dockerfile, package.json y/o package-lock.json. Esto es debido a que, en el caso de que se modifique el Dockerfile, se deberá volver a construir la imagen y, en el caso de que se modifique el fichero package.json, se deberá volver a instalar las dependencias. Elegimos que se haga al pushear a master porque unir un pull-request genera este tipo de evento, y se supone que nunca pushearemos a master directamente.
+- Se especifica que la acción se ejecute cuando se haga un cierre un pull-request a la rama principal del repositorio, y además se modifiquen los ficheros ``Dockerfile``, ``package.json`` y/o ``package-lock.json``. Esto es así porque de cambiar estos ficheros, es probable que se haya modificado la imagen Docker, por lo que tendremos que reconstruirla y volver a publicarla. Debe tenerse en cuenta que el evento de cierre de un pull-request también se dispara cuando se cierra sin mergear, por lo que tenemos que añadir al principio del ``job`` la siguiente línea:
+
+```	
+if: github.event.pull_request.merged == true
+```
+para que sólo se ejecute cuando se cierra un pull-request y se mergea en la rama principal, que es cuando realmente puede que necesitemos modificar la imagen Docker.
 
 - Dentro del apartado ``Log in to DockerHub``, debemos indicar nuestro usuario y contraseña, para que la Action pueda actualizar el contenedor en nuestro nombre, pero como es obvio, no queremos exponer nuestras credenciales de acceso al público. Para ello, se utiliza la opción ``secrets`` de Github Actions, los cuales se pueden crear en los ajustes del repositorio.
 ![secrets](imgs/repository_secrets.png)
@@ -36,7 +41,7 @@ Para automatizar la actualización del README del repositorio en DockerHub, se h
 
 La acción es bastante sencilla de utilizar, simplemente especificamos mediante los ``secrets`` las credenciales de acceso a nuestro perfil de DockerHub, y el nombre del repositorio en el que queremos actualizar el README. 
 
-Esta acción sólo se ejecuta cuando se hace un push en la rama master y se haya modificado el fichero README. Una vez más, elegimos que se pueda ejecutar la acción al pushear a master porque unir un pull-request genera este tipo de evento, y se supone que nunca pushearemos a master directamente.
+Las restricciones especificadas para la ejecución de esta Github Action son las mismas que las de la anterior, pues se ejecuta cuando se cierra un pull-request y se mergea en la rama principal, sin embargo, también requerirá de la modificación del fichero ``README.md``, como era de esperar.
 
 Si pusheamos los cambios realizados en el marco de este hito (aún no se especificaba la restricción de la rama master), se puede ver que se ejecuta el Action correctamente. Si acudimos a [la página de DockerHub](https://hub.docker.com/repository/docker/modejota/vendorvert) podremos ver como se ha actualizado correctamente el README. La Action de Peter-Evans que hemos usado también permite cambiar la descripción del proyecto, pero dada que la especificada en el repositorio de Github es más larga que la permitida en DockerHub, opto por no incluirlo.
 
