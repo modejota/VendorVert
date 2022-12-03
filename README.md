@@ -25,6 +25,6 @@ La documentación de este hito se encuentra en [este fichero](docs/hito2/2_frame
 
 La documentación de este hito se encuentra en [esta carpeta](docs/hito3). En él se describe la instalación de Docker para uso uso en WSL2, la justificación de la elección del contenedor base, así como una descripción del Dockerfile empleado para la creación de nuestro propio contenedor.
 
-También se adjunta documentación sobre cómo realizar el despliegue automático del contenedor en DockerHub y Github Container Registry haciendo uso de Github Actions. Se incluye también como actualizar el README del contenedor en DockerHub de forma automática cuando el README de nuestro repositorio sufra cambios.
+También se adjunta documentación sobre cómo realizar el despliegue automático del contenedor en DockerHub y Github Container Registry haciendo uso de Github Actions. Se incluye también como actualizar el README del contenedor en DockerHub de forma automática cuando el fichero README de nuestro repositorio sufra cambios.
 
 :construction: **En construcción conforme avance la asignatura** :construction:
