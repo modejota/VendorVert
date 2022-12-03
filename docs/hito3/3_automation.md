@@ -7,54 +7,28 @@ Github Container Registry es un servicio de almacenamiento de imágenes Docker q
 Para automatizar la publicación de la imagen en DockerHub y Github Container Registry, se ha creado un fichero de configuración de Github Actions. Dicho fichero es una modificación del último script que se puede encontrar en [esta página web](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images). 
 
 A continuación se destacan algunos puntos importantes del fichero de configuración.
-```
-on:
-  push:
-    paths:
-      - 'Dockerfile'
-      - 'package.json'
-      - 'package-lock.json'
-    branches:
-      - master
-```
-- Se especifica que la acción se ejecute cuando se haga un push en la rama master y cuando se modifiquen los ficheros Dockerfile, package.json y package-lock.json. Esto es debido a que, en el caso de que se modifique el Dockerfile, se deberá volver a construir la imagen y, en el caso de que se modifique el fichero package.json, se deberá volver a instalar las dependencias. Elegimos que se haga al pushear a master porque unir un pull-request genera este tipo de evento, y se supone que nunca pushearemos a master directamente.
 
-```
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: |
-            modejota/vendorvert
-            ghcr.io/${{ github.repository }}
-          tags: |
-            latest
-```
-- Simplemente se especifica que se suba con la etiqueta ``latest``, ya que si no, el fragmento de código que hay a continuación en el Action lo sube con una etiqueta igual al nombre de la rama, pero no actualiza latest. Lo más normal es que se use ``latest`` al descargar el contenedor, por lo que es bastante importante este cambio. 
-- Nótese que en el apartado ``images`` especificamos tanto el nombre de usuario como el nombre del repositorio en DockerHub, y en el apartado ``ghcr.io/${{ github.repository }}`` especificamos el nombre de usuario y el nombre del repositorio en Github Container Registry. 
+- Se especifica que la acción se ejecute cuando se haga un push en la rama master y cuando se modifiquen los ficheros Dockerfile, package.json y/o package-lock.json. Esto es debido a que, en el caso de que se modifique el Dockerfile, se deberá volver a construir la imagen y, en el caso de que se modifique el fichero package.json, se deberá volver a instalar las dependencias. Elegimos que se haga al pushear a master porque unir un pull-request genera este tipo de evento, y se supone que nunca pushearemos a master directamente.
 
-```
-- name: Log in to Docker Hub
-  uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-  with:
-    username: ${{ secrets.DOCKER_USERNAME }}
-    password: ${{ secrets.DOCKER_PASSWORD }}
-
-- name: Log in to the Container registry
-  uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-  with:
-    registry: ghcr.io
-    username: ${{ github.actor }}
-    password: ${{ secrets.GITHUB_TOKEN }}
-```
-- Necesitamos especificar el usuario y contraseña de nuestra cuenta de DockerHub, pero obviamente esta información no debe ser visible a ningún usuario. Para ello, se utiliza la opción ``secrets`` de Github Actions, los cuales se pueden crear en los ajustes del repositorio.
+- Dentro del apartado ``Log in to DockerHub``, debemos indicar nuestro usuario y contraseña, para que la Action pueda actualizar el contenedor en nuestro nombre, pero como es obvio, no queremos exponer nuestras credenciales de acceso al público. Para ello, se utiliza la opción ``secrets`` de Github Actions, los cuales se pueden crear en los ajustes del repositorio.
 ![secrets](imgs/repository_secrets.png)
-Además, si nos fijamos, vemos que existe un ``GITHUB_TOKEN`` en el flujo de trabajo. Este token es creado automáticamente por Github y permite que el Action pueda interactuar con el repositorio. No necesitamos crearlo nosotros, a diferencia de los otros ``secrets`` anteriormente mencionados.
 
-Si pusheamos los cambios realizados en el marco de este hito (aún no se especificaba la restricción de la rama master), se puede ver que se ejecuta el Action correctamente. Además, se puede ver que se ha subido la imagen a DockerHub y a Github Container Registry.
+- Dentro del apartado ``Log in to the Container registry``, debemos indicar nuestras credenciales de acceso de Github, pero funciona de una manera distinta a lo que se usaba para acceder a DockerHub. El nombre de usuario sí es el mismo, y se puede especificar mediante ``${{ github.actor }}``, pero la contraseña es un token automático que genera Github en cada lanzamiento de la Action, no es un ``secret`` que debamos crear manualmente ni gestionar nosotros, a diferencia de lo usado en DockerHub.
+
+
+- Dentro del apartado ``Extract metadata (tags, labels) for Docker``:
+  * especificamos que se utilice el tag ``latest``. La Github Action de ejemplo asigna automáticamente una etiqueta con el mismo nombre que la rama que nos encontremos, pero no actualiza el tag ``latest``, como era de esperar. Indicando manualmente el tag, hacemos que sólo se actualice el ``latest``, que es el que descargaría alguien por defecto si no indica tag explícito alguno. Opto por no mantener el tag con el nombre de la rama, pues no le encuentro demasiada utilidad, pero podría considerarse en un futuro.
+  
+  * dentro de la sección  ``images`` especificamos tanto el nombre de usuario como el nombre del repositorio en DockerHub (identificadores que nos permiten acceder al contenedor en dicha plataforma), como el enlace donde se publicará nuestra imagen en el Github Container Registry, que es ``ghcr.io/${{ github.repository }}``. 
+
+
+Si pusheamos los cambios realizados en el marco de este hito (aún no se especificaba la restricción de la rama master), se puede ver que se ejecuta el Action correctamente. 
 ![Docker Update by Github Action](./imgs/GithubAction_docker_funciona.png)
 
-<!-- Añadir las otras capturas de pantalla -->
+Además, se puede ver que se ha subido correctamente la imagen a DockerHub (primera imagen) y a Github Container Registry (segunda imagen). El enlace de DockerHub de la imagen es [este](https://hub.docker.com/repository/docker/modejota/vendorvert); mientras que el enlace de Github Container Registry es [este otro](https://github.com/modejota/VendorVert/pkgs/container/vendorvert).
+
+![Image in DokcerHub](./imgs/image_in_dockerhub.png)
+![Image in GHCR](./imgs/image_in_ghcr.png)
  
 ## Automatización con GitHub Actions del README del repositorio en DockerHub
 
@@ -64,7 +38,6 @@ La acción es bastante sencilla de utilizar, simplemente especificamos mediante 
 
 Esta acción sólo se ejecuta cuando se hace un push en la rama master y se haya modificado el fichero README. Una vez más, elegimos que se pueda ejecutar la acción al pushear a master porque unir un pull-request genera este tipo de evento, y se supone que nunca pushearemos a master directamente.
 
-Si pusheamos los cambios realizados en el marco de este hito (aún no se especificaba la restricción de la rama master), se puede ver que se ejecuta el Action correctamente. Además, se puede ver que se ha actualizado el README del repositorio en DockerHub. 
-![Docker Update by Github Action](./imgs/GithubAction_README_funciona.png)
+Si pusheamos los cambios realizados en el marco de este hito (aún no se especificaba la restricción de la rama master), se puede ver que se ejecuta el Action correctamente. Si acudimos a [la página de DockerHub](https://hub.docker.com/repository/docker/modejota/vendorvert) podremos ver como se ha actualizado correctamente el README. La Action de Peter-Evans que hemos usado también permite cambiar la descripción del proyecto, pero dada que la especificada en el repositorio de Github es más larga que la permitida en DockerHub, opto por no incluirlo.
 
-<!-- Añadir la otra imagen >
+![Docker Update by Github Action](./imgs/GithubAction_README_funciona.png)
