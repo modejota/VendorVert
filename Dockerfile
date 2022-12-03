@@ -1,4 +1,5 @@
-FROM alpine:latest  
+# Alpine Linux base image
+FROM alpine:latest
 
 # Create node user and install node and npm. Create directory for packages and set permissions
 RUN adduser -S node && apk add --no-cache --update nodejs npm && mkdir /node_modules && chown node /node_modules
