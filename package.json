@@ -1,6 +1,6 @@
 {
   "name": "vendorvert",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Sistema de ayuda a la toma de decisiones para pequeños negocios.",
   "scripts": {
     "check": "tsc --noEmit",
@@ -8,7 +8,9 @@
     "clean": "tsc --build --clean",
     "test" : "jest",
     "coverage": "jest --coverage --no-cache",
-    "postclean": "rm -rf dist && rm -rf docs/coverage"
+    "postclean": "rm -rf dist && rm -rf docs/coverage",
+    "docker:build": "docker build -t vendorvert .",
+    "docker:run": "docker run -t -v `pwd`:/app/test vendorvert"
   },
   "repository": {
     "type": "git",

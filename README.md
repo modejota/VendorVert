@@ -21,4 +21,10 @@ En [este documento](docs/hito1/1_primeras_decisiones.md) se justifican las prime
 
 La documentación de este hito se encuentra en [este fichero](docs/hito2/2_framework_tests.md). En él se describe la justificación del framework de tests, así como la biblioteca de aserciones, que se van a usar para el proyecto. Se detalla también la instalación y configuración de ambos, así como la creación de los primeros tests.
 
+## Hito 3. Contenedores.
+
+La documentación de este hito se encuentra en [esta carpeta](docs/hito3). En él se describe la instalación de Docker para uso uso en WSL2, la justificación de la elección del contenedor base, así como una descripción del Dockerfile empleado para la creación de nuestro propio contenedor.
+
+También se adjunta documentación sobre cómo realizar el despliegue automático del contenedor en DockerHub y Github Container Registry haciendo uso de Github Actions. Se incluye también como actualizar el README del contenedor en DockerHub de forma automática cuando el README de nuestro repositorio sufra cambios.
+
 :construction: **En construcción conforme avance la asignatura** :construction:
