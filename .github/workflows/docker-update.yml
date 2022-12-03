@@ -7,7 +7,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
     branches:
-      - master
+      - main
 
 jobs:
   push_to_registries:
