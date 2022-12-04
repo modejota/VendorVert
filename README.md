@@ -27,4 +27,8 @@ La documentación de este hito se encuentra en [esta carpeta](docs/hito3). En é
 
 También se adjunta documentación sobre cómo realizar el despliegue automático del contenedor en DockerHub y Github Container Registry haciendo uso de Github Actions. Se incluye también como actualizar el README del contenedor en DockerHub de forma automática cuando el fichero README de nuestro repositorio sufra cambios.
 
+## Hito 4. Integración continua.
+
+La documentación de este hito se encuentra en [esta carpeta](docs/hito4). En él se comparan diversos servicios de integración continua, y se justifica la elección de varios de ellos. Se describe también la configuración de dichos servicios.
+
 :construction: **En construcción conforme avance la asignatura** :construction:
