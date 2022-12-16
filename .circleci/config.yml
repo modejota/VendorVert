@@ -6,7 +6,7 @@ jobs:
   docker-tests:
     docker:
       - image: modejota/vendorvert
-    resource_class: medium
+    resource_class: small
     steps:
       - checkout
       - run:
@@ -15,6 +15,6 @@ jobs:
 
 # Invoke jobs via workflows
 workflows:
-  say-hello-workflow:
+  docker-ci-tests:
     jobs:
       - docker-tests
