@@ -6,6 +6,7 @@ jobs:
   docker-tests:
     docker:
       - image: modejota/vendorvert
+    resource_class: medium
     steps:
       - checkout
       - run:
