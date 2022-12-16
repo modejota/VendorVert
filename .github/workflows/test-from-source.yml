@@ -1,6 +1,9 @@
 name: CI Test using source code
 
-on: [push]
+on:
+  push:
+    paths:
+      - '*.ts'
 
 jobs:
   build:
