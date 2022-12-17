@@ -14,4 +14,4 @@ jobs:
         run: docker pull docker.io/modejota/vendorvert:latest
 
       - name: Test using Docker image
-        run:  docker run -t -v `pwd`:/app/test vendorvert
+        run:  docker run -t -v `pwd`:/app/test modejota/vendorvert
