@@ -1,9 +1,6 @@
 name: CI Test using Docker image
 
-on:
-  push:
-    branches:
-      - never-run-this-branch
+on: [push]
 
 jobs:
   push_to_registry:
