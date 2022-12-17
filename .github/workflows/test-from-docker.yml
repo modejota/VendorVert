@@ -5,11 +5,12 @@ on: [push]
 jobs:
   container-tests:
     name: Execute tests from Docker image
-    runs-on: ubuntu-latest
-    container:
-      image: modejota/vendorvert
-      env:
-        NODE_ENV: test
+runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm run test
+
+      - name: Pull Docker Image
+        run: docker pull modejota/vendorvert:latest
+
+      - name: Test using Docker image
+        run:  docker run modejota/vendorvert:latest
