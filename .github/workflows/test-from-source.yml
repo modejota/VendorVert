@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '*.ts'
+      - '*.js'
 
 jobs:
   build:
