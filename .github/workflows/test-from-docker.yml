@@ -1,6 +1,8 @@
 name: CI Test using Docker image
 
-on: [push]
+on: 
+  push:
+    branches: [ never-used-branch ]
 
 jobs:
   container-tests:
