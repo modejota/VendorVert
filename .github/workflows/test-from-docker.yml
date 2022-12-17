@@ -11,6 +11,5 @@ jobs:
       env:
         NODE_ENV: test
     steps:
-      - name: Run docker tests
-        uses: actions/checkout@v2
-        run: npm run test
+      - uses: actions/checkout@v2
+      - run: npm run test
