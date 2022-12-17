@@ -1,0 +1,14 @@
+name: CI Test using Docker image
+
+on:
+  push:
+    branches:
+      - never-run-this-branch
+
+jobs:
+  push_to_registry:
+    name: Execute tests from Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run docker tests
+        run: docker run -t -v `pwd`:/app/test modejota/vendorvert
