@@ -10,4 +10,4 @@ jobs:
       image: modejota/vendorvert
     steps:
       - name: Run docker tests
-        run: npm run test
+        run: docker run -t -v `pwd`:/app/test vendorvert
