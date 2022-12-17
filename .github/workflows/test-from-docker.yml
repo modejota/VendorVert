@@ -1,0 +1,16 @@
+name: CI Test using Docker image
+
+on: 
+  push:
+    branches: [ never-used-branch ]
+
+jobs:
+  container-tests:
+    name: Execute tests from Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Test using Docker image
+        run:  docker run -t -v `pwd`:/app/test modejota/vendorvert
