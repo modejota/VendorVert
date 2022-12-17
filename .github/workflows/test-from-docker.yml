@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: modejota/vendorvert
+      env:
+        NODE_ENV: test
     steps:
       - name: Run docker tests
-        run: docker run -t -v `pwd`:/app/test vendorvert
+        uses: actions/checkout@v2
+        run: npm run test
