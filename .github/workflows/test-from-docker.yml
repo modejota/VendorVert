@@ -9,9 +9,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-      
-      - name: pull docker
-        run: docker pull docker.io/modejota/vendorvert:latest
 
       - name: Test using Docker image
         run:  docker run -t -v `pwd`:/app/test modejota/vendorvert
