@@ -3,9 +3,11 @@ name: CI Test using Docker image
 on: [push]
 
 jobs:
-  push_to_registry:
+  container-tests:
     name: Execute tests from Docker image
     runs-on: ubuntu-latest
+    container:
+      image: modejota/vendorvert
     steps:
       - name: Run docker tests
-        run: docker run -t -v `pwd`:/app/test modejota/vendorvert
+        run: npm run tests
