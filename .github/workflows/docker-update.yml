@@ -9,6 +9,7 @@ on:
       - 'Dockerfile'
       - 'package.json'
       - 'package-lock.json'
+  workflow_dispatch:
 
 jobs:
   push_to_registries:

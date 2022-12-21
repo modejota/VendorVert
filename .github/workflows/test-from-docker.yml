@@ -1,8 +1,12 @@
 name: CI Test using Docker image
 
-on: 
+on:
   push:
-    branches: [ never-used-branch ]
+    paths:
+      - '*.ts'
+      - '*.js'
+  workflow_dispatch:
+    
 
 jobs:
   container-tests:
