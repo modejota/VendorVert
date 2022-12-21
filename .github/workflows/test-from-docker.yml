@@ -5,6 +5,8 @@ on:
     paths:
       - '*.ts'
       - '*.js'
+  workflow_dispatch:
+    
 
 jobs:
   container-tests:
