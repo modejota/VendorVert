@@ -4,14 +4,13 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 jobs:
   docker-tests:
-    docker:
-      - image: modejota/vendorvert
-    resource_class: small
+    machine:
+      image: ubuntu-2204:2022.04.2
     steps:
       - checkout
       - run:
           name: "Running tests in Docker container"
-          command: npm run test
+          command: docker run -t -v `pwd`:/app/test modejota/vendorvert
 
 # Invoke jobs via workflows
 workflows:
