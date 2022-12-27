@@ -4,9 +4,8 @@ import { APIValidators as APIV } from '../constants/api_validators';
 import { ProductType } from '../models/product_type';
 import { parseFacturas, parseProductos } from '../utils/parsers';
 import { HandlerError } from '../errors/handler_error';
+import { logger } from '../utils/logger';
 
-// En todos van a faltar los parsers por ahora.
-// Modificar para que haya 409 cuando se intente crear un producto/factura que ya existe (POST).
 export default async function billController(fastify: FastifyInstance) {
 
     fastify.route({
@@ -30,6 +29,7 @@ export default async function billController(fastify: FastifyInstance) {
                 let bill = handler.obtener_factura(data.id)
                 reply.code(200).send(bill)
             } catch {
+                logger.error(`Invoice with ID ${data.id} not found.`)
                 reply.code(404).send({error: `Invoice with ID ${data.id} not found.`})
             }
         }
@@ -45,13 +45,10 @@ export default async function billController(fastify: FastifyInstance) {
             let ID = JSON.parse(JSON.stringify(request.params)).id
             try {
                 let factura = handler.obtener_factura(ID)
-                try {
-                    let productos = parseProductos(factura.productos)
-                    reply.code(200).send({products: productos})
-                } catch {
-                    reply.code(404).send({error: `Invoice with ID ${ID} has no products.`})
-                }
+                let productos = parseProductos(factura.productos)
+                reply.code(200).send({products: productos})
             } catch {
+                logger.error(`Invoice with ID ${ID} not found so no products can be retreived.`)
                 reply.code(404).send({error: `Invoice with ID ${ID} not found.`})
             }
         }
@@ -68,12 +65,14 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 handler.obtener_factura(params.id)
             } catch {
+                logger.error(`Invoice with ID ${params.id} not found.`)
                 reply.code(404).send({error: `Invoice with ID ${params.id} not found.`})
             }
             try {
                 let product = handler.obtener_producto_factura(params.id, params.idp)
                 reply.code(200).send({product: product})
             } catch {
+                logger.error(`Product with ID ${params.idp} not found in invoice with ID ${params.id}.`)
                 reply.code(404).send({error: `Product with ID ${params.idp} not found in invoice with ID ${params.id}.`})
             }
         }
@@ -89,13 +88,10 @@ export default async function billController(fastify: FastifyInstance) {
             let ID = JSON.parse(JSON.stringify(request.params)).id
             try {
                 let factura = handler.obtener_factura(ID)
-                try {
-                    let client = factura.client
-                    reply.code(200).send({client: client})
-                } catch {
-                    reply.code(404).send({error: `Invoice with ID ${ID} has no client.`})
-                }
+                let client = factura.client
+                reply.code(200).send({client: client})
             } catch {
+                logger.error(`Invoice with ID ${ID} not found so no client can be retreived.`)
                 reply.code(404).send({error: `Invoice with ID ${ID} not found.`})
             }
         }
@@ -112,6 +108,7 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 reply.code(200).send({total: handler.calcular_total_factura(ID)})
             } catch {
+                logger.error(`Invoice with ID ${ID} not found so no total can be retreived.`)
                 reply.code(404).send({error: `Invoice with ID ${ID} not found.`})
             }
         }
@@ -130,13 +127,15 @@ export default async function billController(fastify: FastifyInstance) {
                 try {
                     handler.obtener_cliente(data.idc)
                 } catch {
+                    logger.error(`Client with ID ${data.idc} not found.`)
                     reply.status(404).send({error: `Client with ID ${data.idc} not found.`})
                 }
                 handler.crear_factura(data.id, data.idc)
                 reply.header("Location", `/invoices/${data.id}`)
+                logger.info(`Invoice with ID ${data.id} created successfully.`)
                 reply.status(201).send({result: `Invoice with ID ${data.id} created successfully.`})
-
             } catch {
+                logger.error(`Invoice with ID ${data.id} already exists so it can't be created.`)
                 reply.status(409).send({error: `Invoice with ID ${data.id} already exists.`})
             }
         }
@@ -157,14 +156,17 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 handler.existe_factura(ID)
             } catch {
+                logger.error(`Invoice with ID ${ID} not found so no product can be added to that.`)
                 reply.status(404).send({error: `Invoice with ID ${ID} not found.`})
             }
             try {
                 let product = handler.crear_producto(data.id, data.nombre, data.marca, data.tipo, data.PVP)
                 handler.aniadir_producto_factura(ID, product, data.cantidad)
                 reply.header("Location", `/invoices/${ID}/products/${data.id}`)
+                logger.info(`Product with ID ${data.id} added to invoice with ID ${ID} successfully.`)
                 reply.status(201).send({result: `Product with ID ${data.id} added to invoice with ID ${ID} successfully.`})
             } catch {
+                logger.error(`Product with ID ${data.id} already exists in invoice with ID ${ID}.`)
                 reply.status(409).send({error: `Product with ID ${data.id} already exists in invoice with ID ${ID}.`})
             }
         }
@@ -184,19 +186,21 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 handler.obtener_factura(params.id)
             } catch {
+                logger.error(`Invoice with ID ${params.id} not found so no product can be updated in that.`)
                 reply.status(404).send({error: `Invoice with ID ${params.id} not found.`})
             }
             try {
                 let product = handler.crear_producto(params.idp, data.nombre, data.marca, data.tipo, data.PVP)
                 handler.actualizar_producto_factura(params.id, product, data.cantidad)
+                logger.info(`Product with ID ${params.idp} updated in invoice with ID ${params.id} successfully.`)
                 reply.status(200).send({result: `Product with ID ${params.idp} updated in invoice with ID ${params.id} successfully.`})
             } catch {
+                logger.error(`Product with ID ${params.idp} not found in invoice with ID ${params.id}.`)
                 reply.status(404).send({error: `Product with ID ${params.idp} not found in invoice with ID ${params.id}.`})
             }
         }
     })
 
-    // This has to be tested
     fastify.route({
         method: 'PATCH',
         url: '/:id/client',
@@ -210,13 +214,16 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 handler.obtener_factura(params.id)
             } catch {
+                logger.error(`Invoice with ID ${params.id} not found so no client can be updated in that.`)
                 reply.status(404).send({error: `Invoice with ID ${params.id} not found.`})
             }
             try {
                 let client = handler.obtener_cliente(data.id)
                 handler.modificar_cliente_factura(params.id, client)
+                logger.info(`Client in invoice with ID ${params.id} updated successfully to ID ${data.id}.`)
                 reply.status(200).send({result: `Client in invoice with ID ${params.id} updated successfully to ID ${data.id}.`})
             } catch {
+                logger.error(`Client with ID ${data.id} not found.`)
                 reply.status(404).send({error: `Client with ID ${data.id} not found.`})
             }
         }
@@ -235,12 +242,15 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 handler.obtener_factura(params.id)
             } catch {
+                logger.error(`Invoice with ID ${params.id} not found so no product's quantity can be updated in that.`)
                 reply.status(404).send({error: `Invoice with ID ${params.id} not found.`})
             }
             try {
                 handler.actualizar_cantidad_producto_factura(params.id, params.idp, data.cantidad)
+                logger.info(`Quantity of product with ID ${params.idp} updated in invoice with ID ${params.id} successfully.`)
                 reply.status(200).send({result: `Quantity of product with ID ${params.idp} updated in invoice with ID ${params.id} successfully.`})
             } catch {
+                logger.error(`Product with ID ${params.idp} not found in invoice with ID ${params.id}.`)
                 reply.status(404).send({error: `Product with ID ${params.idp} not found in invoice with ID ${params.id}.`})
             }
         }
@@ -256,8 +266,10 @@ export default async function billController(fastify: FastifyInstance) {
             let ID = JSON.parse(JSON.stringify(request.params)).id
             try {
                 handler.eliminar_factura(ID)
+                logger.info(`Invoice with ID ${ID} deleted successfully.`)
                 reply.status(200).send({result: `Invoice with ID ${ID} deleted successfully.`})
             } catch {
+                logger.error(`Invoice with ID ${ID} not found.`)
                 reply.status(404).send({error: `Invoice with ID ${ID} not found.`})
             }
         }
@@ -274,12 +286,15 @@ export default async function billController(fastify: FastifyInstance) {
             try {
                 handler.obtener_factura(params.id)
             } catch {
+                logger.error(`Invoice with ID ${params.id} not found so no product can be deleted from that.`)
                 reply.status(404).send({error: `Invoice with ID ${params.id} not found.`})
             }
             try {
                 handler.eliminar_producto_factura(params.id, params.idp)
+                logger.info(`Product with ID ${params.idp} deleted from invoice with ID ${params.id} successfully.`)
                 reply.status(200).send({result: `Product with ID ${params.idp} deleted from invoice with ID ${params.id} successfully.`})
             } catch {
+                logger.error(`Product with ID ${params.idp} not found in invoice with ID ${params.id}.`)
                 reply.status(404).send({error: `Product with ID ${params.idp} not found in invoice with ID ${params.id}.`})
             }
         }

@@ -8,7 +8,6 @@ import { StorageError } from "./errors/storage_error";
 import { HandlerError } from "./errors/handler_error";
 import { ProductError } from "./errors/product_error";
 import { Client } from "./models/client";
-import { logger } from "./utils/logger";
 
 class Handler {
     private _existencias: Storage; 
@@ -41,7 +40,6 @@ class Handler {
      public crear_producto(id_producto:number, nombre:string, marca:string, tipo:ProductType, PVP:number): Product {
         try {
             let producto = new Product(id_producto,nombre,marca,tipo,PVP) 
-            logger.info(`Producto creado con éxito: ${producto.toString()}`)
             return producto
         } catch (exception) {
             if (exception instanceof ProductError)

@@ -3,6 +3,7 @@ import { handler } from '../handler';
 import { APIValidators as APIV } from '../constants/api_validators';
 import { Client } from "../models/client";
 import { parseClientes } from "../utils/parsers";
+import { logger } from "../utils/logger";
 
 export default async function clientController(fastify: FastifyInstance) {
 
@@ -27,6 +28,7 @@ export default async function clientController(fastify: FastifyInstance) {
                 let client = handler.obtener_cliente(data.id)
                 reply.code(200).send({cliente: client})
             } catch {
+                logger.error(`Client with ID ${data.id} not found.`)
                 reply.code(404).send({error: `Client with ID ${data.id} not found.`})
             }
         }
@@ -51,6 +53,7 @@ export default async function clientController(fastify: FastifyInstance) {
                 }
                 reply.code(200).send({facturas: bills})
             } catch {
+                logger.error(`Client with ID ${ID} not found so no invoices can be retreived.`)
                 reply.code(404).send({error: `Client with ID ${ID} not found.`})
             }
         }
@@ -68,11 +71,14 @@ export default async function clientController(fastify: FastifyInstance) {
                 let client = new Client(data.id, data.nombre, data.apellidos, data.email)
                 try {
                     handler.aniadir_cliente(client)
+                    logger.info(`Client with ID ${data.id} created successfully.`)
                     reply.code(201).send({result: `Client with ID ${data.id} created successfully.`})
                 } catch {
+                    logger.error(`Client with ID ${data.id} already exists.`)
                     reply.code(409).send({error: `Client with ID ${data.id} already exists.`})
                 }
             } catch {
+                logger.error(`Client with ID ${data.id} is not specified correctly so it can't be created.`)
                 reply.code(400).send({error: `Client with ID ${data.id} is not specified correctly.`})
 
             }
@@ -94,11 +100,14 @@ export default async function clientController(fastify: FastifyInstance) {
                 try {
                     handler.eliminar_cliente(params.id)
                     handler.aniadir_cliente(new Client(params.id, data.nombre, data.apellidos, data.email))
+                    logger.info(`Client with ID ${params.id} updated successfully.`)
                     reply.code(200).send({result: `Client with ID ${params.id} updated successfully.`})
                 } catch {
+                    logger.error(`Client with ID ${data.id} is not specified correctly so it can't be created.`)
                     reply.code(400).send({error: `Client with ID ${params.id} is not specified correctly.`})
                 }
             } catch {
+                logger.error(`Client with ID ${params.id} not found so it can't be modified.`)
                 reply.code(404).send({error: `Client with ID ${params.id} not found.`})
             }
         }
@@ -116,6 +125,7 @@ export default async function clientController(fastify: FastifyInstance) {
                 handler.eliminar_cliente(data.id)
                 reply.code(200).send({result: `Client with ID ${data.id} deleted successfully.`})
             } catch {
+                logger.error(`Client with ID ${data.id} not found so it can't be deleted.`)
                 reply.code(404).send({error: `Client with ID ${data.id} not found.`})
             }
         }
