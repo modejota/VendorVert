@@ -31,4 +31,8 @@ También se adjunta documentación sobre cómo realizar el despliegue automátic
 
 La documentación de este hito se encuentra en [esta carpeta](docs/hito4). En él se comparan diversos servicios de integración continua, y se justifica la elección de varios de ellos. Se describe también la configuración de dichos servicios.
 
+## Hito 5. Microservicios.
+
+La documentación de este hito se encuentra en [esta carpeta](docs/hito5). En él se describe la justificación de la elección de los microservicios: framework para la API REST, servicio de logging y servicio de configuración remota. También se describen las rutas de la API REST creada.
+
 :construction: **En construcción conforme avance la asignatura** :construction:
