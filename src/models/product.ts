@@ -22,6 +22,7 @@ export class Product {
      * @param marca Marca y/o fabricante del producto
      * @param tipo Tipo de producto en el que se enmarca
      * @param PVP Precio de venta del producto
+     * @throws ProductError si alguno de los parámetros no es válido
      */
     constructor(id_producto:number, nombre:string, marca:string, tipo:ProductType, PVP:number) {
 
