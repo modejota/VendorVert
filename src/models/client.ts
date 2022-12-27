@@ -2,7 +2,8 @@ import { Constants } from "../constants/constants";
 import { ClientError } from "../errors/client_error";
 
 /**
- * Representación simplificada de un cliente
+ * Representación simplificada de un cliente.
+ * Por simplicidad, no se incluye la dirección, el teléfono, la fecha de nacimiento, fecha de alta, etc.
  * @public
  */
 export class Client {
