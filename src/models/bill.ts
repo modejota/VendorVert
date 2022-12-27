@@ -4,7 +4,7 @@ import { Constants } from "../constants/constants";
 import { Client } from "./client";
 
 /**
- * Representa una factura del negocio
+ * Representa una factura del negocio.
  * @public
  */
 export class Bill {
