@@ -7,7 +7,7 @@ export default async function router (fastify: FastifyInstance) {
     
     // Register controllers
     fastify.register(storageController, { prefix: "/products" })
-    fastify.register(billController, { prefix: "/bills" })
+    fastify.register(billController, { prefix: "/invoices" })
     fastify.register(clientController, { prefix: "/clients" })
 
     // Default route, just a greeting
