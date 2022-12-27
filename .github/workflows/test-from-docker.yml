@@ -3,10 +3,9 @@ name: CI Test using Docker image
 on:
   push:
     paths:
-    - '**/*.{ts,js}'
-  workflow_dispatch:
+    - '*.ts'
+    - '*.js'
     
-
 jobs:
   container-tests:
     name: Execute tests from Docker image

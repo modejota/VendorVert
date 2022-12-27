@@ -3,7 +3,8 @@ name: CI Test using source code
 on:
   push:
     paths:
-    - src
+    - '*.ts'
+    - '*.js'
 
 jobs:
   build:
