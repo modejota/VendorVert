@@ -3,7 +3,7 @@ name: CI Test using source code
 on:
   push:
     paths:
-    - '**/*.{ts,js}'
+      - '**/*.{ts,js}'
   workflow_dispatch:
 
 jobs:
