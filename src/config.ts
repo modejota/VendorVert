@@ -32,7 +32,7 @@ class Configuration {
         if(this._log_directory == null && process.env.LOG_DIR != undefined) {
             this._log_directory = process.env.LOG_DIR
         } else {
-            this._log_directory = "/tmp/log/vendorvert/"
+            this._log_directory = "/tmp/logs/vendorvert/"
         }
 
         (async () => {

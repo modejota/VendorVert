@@ -1,4 +1,6 @@
 import { configuration as cfg  } from "../config";
+import * as fs from "fs";
+const moment = require("moment");
 
 describe("Test configuration", () => {
     it ('Debería existir', () => {
@@ -28,6 +30,18 @@ describe("Test configuration", () => {
         expect(cfg.log_file_path).toBeDefined();
         expect(cfg.log_file_path).toBe("/tmp/logs/vendorvert/logs");
         //No extension, as real name is logs-YYYY-MM-DD.log (see logger.ts)
+    })
+
+    it ('Debería tener una extensión para los logs', () => {
+        expect(cfg.log_file_extension).toBeDefined();
+        expect(cfg.log_file_extension).toBe(".json");
+    })
+
+    it ('Debería existir el fichero para los logs', () => {
+        let realroute = cfg.log_file_path+`-${moment().format('YYYY-MM-DD')}`+cfg.log_file_extension
+        expect(realroute).toBeDefined();
+        expect(realroute).toBe(`/tmp/logs/vendorvert/logs-${moment().format('YYYY-MM-DD')}.json`);
+        expect(fs.existsSync(realroute)).toBe(true);
     })
 
 })
