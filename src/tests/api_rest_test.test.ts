@@ -35,7 +35,7 @@ let aClient = {
     email: "emaildeejemplo@fake.com"
 }
 let modifyingClientData = {
-    nombre: "Cliente 1 modificado",
+    nombre: "Cliente 1 modificado", //ID not needed, it's the same and it's specified in the URL
     apellidos: "Apellidos 1 modificado",
     email: "mailmodified@fake.com"
 }
