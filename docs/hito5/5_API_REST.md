@@ -78,8 +78,6 @@ En un intento de seguir esta filosofía, en nuestro caso se decide que el intent
 #### Verbo PUT
 ---
 
-[ESTO LO TENGO QUE REVISAR EN CODIGO, POR EL 201]
-
 | URI		| Descripción						| Codigos de estado |
 | ---		| ---							| --- |
 | /products/:id	| Modificación de los datos del producto con ID único especificado en la URL del almacén	| 200, 201 |
