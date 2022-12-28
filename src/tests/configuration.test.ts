@@ -11,6 +11,7 @@ describe("Test configuration", () => {
     })
 
     // From now on, we are testing the default values, as we are not running etcd
+    // In local, values comes from .env file, with same values as default values
     it ('Debería tener un puerto para fastify', () => {
         expect(cfg.fastify_port).toBeDefined();
         expect(cfg.fastify_port).toBe(3030);
