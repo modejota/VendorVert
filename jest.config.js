@@ -6,4 +6,5 @@ module.exports = {
     coverageDirectory: 'docs/coverage',
 };
 
-// More options can be specified, I think this is enough for now
+// More options can be specified, I think this is enough for now.
+// Wait, this triggers the CI but src doesn't?
