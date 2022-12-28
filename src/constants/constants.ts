@@ -11,7 +11,7 @@
     /**
      * Longitud máxima del nombre de un producto
      */
-    static readonly LON_NOMBRE_MAX:number = 48
+    static readonly LON_NOMBRE_MAX:number = 64
 
     /**
      * Longitud mínima del nombre de la marca/fabricante de un producto
@@ -21,7 +21,17 @@
     /**
      * Longitud máxima del nombre de la marca/fabricante de un producto
      */
-    static readonly LON_MARCA_MAX:number = 24
+    static readonly LON_MARCA_MAX:number = 48
+
+    /**
+     * Longitud mínima del nombre de un clienet
+     */
+    static readonly LON_NOMBRE_CLIENTE_MIN:number = 2
+
+    /**
+     * Longitud máxima del nombre de un cliente
+     */
+    static readonly LON_NOMBRE_CLIENTE_MAX:number = 32
 
     /**
      * Valor para representar IDs inválidos de productos
@@ -32,5 +42,11 @@
      * Valor para representar una cantidad invalida de un producto
      */
     static readonly CANTIDAD_INVALIDA: number = 0
+
+    /**
+     * Expresión regular para validar el formato de un email
+     */
+    static readonly EMAIL_REGEX: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
 
 }

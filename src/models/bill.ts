@@ -1,24 +1,27 @@
 import { Product } from "./product";
 import { BillError } from "../errors/bill_error";
 import { Constants } from "../constants/constants";
-// Le hará falta los datos del cliente, pero eso lo haremos más adelante
+import { Client } from "./client";
 
 /**
- * Representa una factura del negocio
+ * Representa una factura del negocio.
  * @public
  */
 export class Bill {
     private _productos: Map<number,[_producto: Product, cantidad: number]>;
     private _fecha: Date;
-    //private _client: Client;
+    private _client: Client;
     
     /**
      * Constructor del objeto ventas
      * Crea una venta sin productos
+     * @param fecha Fecha en la que se genera la venta
+     * @param client Cliente que realiza la compra
      */
-    constructor(fecha: Date = new Date()) {
+    constructor(fecha: Date = new Date(), client: Client) {
         this._productos = new Map<number, [Product, number]>();
         this._fecha = fecha;
+        this._client = client;
     }
 
     /**
@@ -27,6 +30,22 @@ export class Bill {
      */
     public get fecha() {
         return this._fecha;
+    }
+
+    /**
+     * Devuelve el cliente que realiza la compra
+     * @returns Cliente de la factura
+     */
+    public get client() {
+        return this._client;
+    }
+
+    /**
+     * Modifica el cliente de la factura
+     * @param client Nuevo cliente de la factura
+     */
+    public set client(client: Client) {
+        this._client = client;
     }
 
     /**

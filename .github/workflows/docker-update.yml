@@ -13,7 +13,7 @@ on:
 
 jobs:
   push_to_registries:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     name: Push Docker image to multiple registries
     runs-on: ubuntu-latest
     permissions:

@@ -1,15 +1,18 @@
+import { ClientError } from "../errors/client_error";
 import { HandlerError } from "../errors/handler_error";
 import { handler } from "../handler";
+import { Client } from "../models/client";
 import { Product } from "../models/product";
 import { ProductType } from "../models/product_type";
 
 let aProduct: Product
+let aClient: Client
 
 beforeAll(() => {
     aProduct = handler.crear_producto(1,"Casio F91W","Casio",ProductType.RELOJERIA_COTIDIANA,12.90) 
+    aClient = new Client(1,"John","Doe","johndoe@gmail.com")
 })
 
-// Por el momento, aplicacion = handler
 describe('Tests unitarios de la aplicación', () => {
 
     describe('Test unitarios relativos a productos', () => {
@@ -67,18 +70,18 @@ describe('Tests unitarios de la aplicación', () => {
         })
     })
 
-    describe('Test unitarios relativos a las facturas', () => {
+    describe('Relativos a las facturas', () => {
         it('Debería probar la creación y añadido de facturas', () => {
-            handler.crear_factura(1)
+            handler.crear_factura(1, aClient.id)
             expect(handler.get_num_items_factura(1) == 1)
     
             const repeatedID = () => {
-                handler.crear_factura(1)
+                handler.crear_factura(1, aClient.id)
             };
             expect(repeatedID).toThrow(HandlerError)
     
             const invalidID = () => {
-                handler.crear_factura(-10)
+                handler.crear_factura(-10, aClient.id)
             };
             expect(invalidID).toThrow(HandlerError)
         })
@@ -232,7 +235,7 @@ describe('Tests unitarios de la aplicación', () => {
         })
     })
 
-   describe('Test unitarios relativos al almacén', () => {
+   describe('Relativos al almacén', () => {
         it('Debería añadir productos al almacén', () => {
             const invalidQuantity = () => {
                 handler.aniadir_producto_almacen(aProduct,-99)
@@ -324,4 +327,65 @@ describe('Tests unitarios de la aplicación', () => {
         })
     })
 
+    
+    describe('Relativos a los clientes', () => {
+        it('Debería probar la creación de clientes', () => {
+            expect(aClient).toBeDefined()
+            let client;
+            
+            const invalidID = () => {
+                client = new Client(-1,"Juan","Pérez","fakemail@org.com") 
+            }
+            expect(invalidID).toThrowError(ClientError)
+    
+            const noName = () => {
+                client = new Client(1,"","","fakemail@org.com") 
+            };
+            expect(noName).toThrow(ClientError) 
+    
+            const shortName = () => {
+                client = new Client(1,"A","Pérez","fakemail@org.com") 
+            };
+            expect(shortName).toThrow(ClientError)  
+    
+            const longName = () => {
+                client = new Client(-1,"This is gonna be an insanely long name so it shouldnt work at all","Pérez","fakemail@org.com") 
+
+            };
+            expect(longName).toThrow(ClientError)  
+    
+            const noSurname = () => {
+                client = new Client(1,"Juanito","","fakemail@org.com") 
+            };
+            expect(noSurname).toThrow(ClientError)  
+    
+            const shortSurname = () => {
+                client = new Client(1,"Juanito","A","fakemail@org.com") 
+            };
+            expect(shortSurname).toThrow(ClientError)  
+    
+            const longSurname = () => {
+                client = new Client(1,"Juanito","This is gonna be an insanely long name so it shouldnt work at all","fakemail@org.com") 
+            };
+            expect(longSurname).toThrow(ClientError)  
+            
+            const noMail = () => {
+                client = new Client(1,"Juanito","Pérez","")
+            };
+            expect(noMail).toThrow(ClientError)
+
+            const invalidMail = () => {
+                client = new Client(1,"Juanito","Pérez","fakemailorg")
+            };
+            expect(invalidMail).toThrow(ClientError)
+        })
+    
+        it('Debería probar los getters de un cliente', () => {
+            expect(aClient.id).toBe(1)
+            expect(aClient.nombre).toBe("John")
+            expect(aClient.apellidos).toBe("Doe")
+            expect(aClient.email).toBe("johndoe@gmail.com")
+        })
+    })
+    
 })

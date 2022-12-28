@@ -7,13 +7,13 @@ import { ProductType } from "./models/product_type";
 import { StorageError } from "./errors/storage_error";
 import { HandlerError } from "./errors/handler_error";
 import { ProductError } from "./errors/product_error";
-// Faltaría añadir a los clientes, pero eso lo haremos más adelante
+import { Client } from "./models/client";
 
 class Handler {
     private _existencias: Storage; 
     private _facturas: Map<number, Bill>; 
     private _last_err_message: string;
-    //private _clients: Map<number, Client>;
+    private _clients: Map<number, Client>;
 
     /**
      * Constructor del objeto manejador
@@ -22,11 +22,13 @@ class Handler {
     constructor() {
         this._existencias = new Storage();
         this._facturas = new Map();
+        this._clients = new Map();
         this._last_err_message = "";
     }
 
     /**
-     * Método para crear un objeto del tipo Producto
+     * Método para crear un objeto del tipo Producto.
+     * Thinking in the API and database, this method is almost useless, so it may be removed in the future.
      * 
      * @param id_producto ID único asignado a cada producto
      * @param nombre Nombre del producto
@@ -134,7 +136,13 @@ class Handler {
      * @param ID_factura ID único de la factura a crear
      * @param fecha Fecha en la que se crea la factura
      */
-    public crear_factura(ID_factura:number, fecha = new Date()) {
+    public crear_factura(ID_factura:number, cliente_ID: number, fecha = new Date()) {
+        if (cliente_ID <= Constants.ID_INVALIDO) {
+            this._last_err_message = `Se intentó crear una factura con para un cliente con ID ${cliente_ID} inválido.`
+            throw new HandlerError(this._last_err_message)
+        } 
+        let cliente = this._clients.get(cliente_ID) as Client
+    
         if (ID_factura <= Constants.ID_INVALIDO) {
             this._last_err_message = `Se intentó crear una factura con ID ${ID_factura} inválido.`
             throw new HandlerError(this._last_err_message)
@@ -142,7 +150,7 @@ class Handler {
             this._last_err_message = `Se intentó crear una factura con ID ${ID_factura} ya existente`
             throw new HandlerError(this._last_err_message)
         } else {
-            let factura = new Bill(fecha)
+            let factura = new Bill(fecha, cliente)
             this._facturas.set(ID_factura,factura)
         }
     }
@@ -163,6 +171,20 @@ class Handler {
             return this._facturas.get(ID_factura) as Bill
         }
     }
+
+    /**
+     * Método para comprobar si una factura existe en el sistema
+     * @param ID_factura ID único de la factura a comprobar
+     * @returns true si la factura existe, false en caso contrario
+     */
+    public existe_factura(ID_factura:number): boolean {
+        if (ID_factura <= Constants.ID_INVALIDO) {
+            this._last_err_message = `Se intentó comprobar si existe una factura con ID ${ID_factura} inválido.`
+            throw new HandlerError(this._last_err_message)
+        }
+        return this._facturas.has(ID_factura)
+    } 
+
 
     /**
      * Método para eliminar una factura a partir de su identificador único
@@ -288,7 +310,30 @@ class Handler {
             }
         }
     }
-    
+
+    /**
+     * Método para modificar el cliente de una factura
+     */
+    public modificar_cliente_factura(ID_factura:number, cliente:Client) {
+        if (!this._facturas.has(ID_factura)) {
+            this._last_err_message = `Se intentó modificar el cliente de una factura con ID ${ID_factura} no existente`
+            throw new HandlerError(this._last_err_message)
+        }
+        if (!this._clients.has(cliente.id)) {
+            this._last_err_message = `Se intentó modificar el cliente de una factura con ID ${ID_factura} por un cliente inexistente`
+            throw new HandlerError(this._last_err_message)
+        }  
+        try {
+            let factura = this._facturas.get(ID_factura) as Bill
+            factura.client = cliente
+            this._facturas.set(ID_factura,factura)
+        } catch (exception) {
+            if (exception instanceof BillError)
+                this._last_err_message = exception.message
+            throw new HandlerError(this._last_err_message)
+        }
+    }
+
     /**
      * Método para calcular el importe total de una factura
      * @param ID_factura Identificador único de la factura
@@ -320,11 +365,57 @@ class Handler {
     }
 
     /**
+     * Método para añadir un cliente al sistema
+     * @param cliente Cliente a añadir
+     */
+    public aniadir_cliente(cliente: Client) {
+        if (this._clients.has(cliente.id)) {
+            this._last_err_message = `Se intentó añadir un cliente con ID ${cliente.id} ya existente`
+            throw new HandlerError(this._last_err_message)
+        }
+        this._clients.set(cliente.id, cliente)
+    }
+
+    /**
+     * Método para eliminar un cliente del sistema
+     */
+    public eliminar_cliente(ID_cliente: number) {
+        if (!this._clients.has(ID_cliente)) {
+            this._last_err_message = `Se intentó eliminar un cliente con ID ${ID_cliente} no existente`
+            throw new HandlerError(this._last_err_message)
+        } else {
+            this._clients.delete(ID_cliente)
+        }
+    }
+
+    /**
+     * Método para obtener un cliente del sistema
+     * @param ID_cliente Identificador único del cliente
+     * @returns Cliente con identificador ID
+     */
+    public obtener_cliente(ID_cliente: number): Client {
+        if (!this._clients.has(ID_cliente)) {
+            this._last_err_message = `Se intentó obtener un cliente con ID ${ID_cliente} no existente`
+            throw new HandlerError(this._last_err_message)
+        } else {
+            return this._clients.get(ID_cliente) as Client
+        }
+    }
+
+    /**
      * Método para calcular el numero de facturas almacenadas en el sistema
      * @returns Numero de facturas distintas
      */
     public get_num_facturas(): number {
         return this._facturas.size
+    }
+
+    /**
+     * Método para calcular el numero de clientes almacenados en el sistema
+     * @returns Numero de clientes distintos
+     */
+    public get_num_clientes(): number {
+        return this._clients.size
     }
 
     /**
@@ -341,6 +432,14 @@ class Handler {
      */
     public get_all_productos_almacen() {
         return this._existencias.inventario;
+    }
+
+    /**
+     * Método para obtener todos los clientes del sistema
+     * @returns Clientes presentes en el sistema
+     */
+    public get_all_clientes() {
+        return this._clients;
     }
 
 }
