@@ -16,17 +16,18 @@ describe("Test configuration", () => {
 
     it ('Debería tener un directorio para los logs', () => {
         expect(cfg.log_directory).toBeDefined();
-        expect(cfg.log_directory).toBe("/tmp/log/vendorvert/");
+        expect(cfg.log_directory).toBe("/tmp/logs/vendorvert/");
     })
 
     it ('Debería tener un fichero para los logs', () => {
         expect(cfg.log_file).toBeDefined();
-        expect(cfg.log_file).toBe("logs.json");
+        expect(cfg.log_file).toBe("logs");
     })
 
     it ('Debería tener una ruta completa para los logs', () => {
         expect(cfg.log_file_path).toBeDefined();
-        expect(cfg.log_file_path).toBe("/tmp/log/vendorvert/logs.json");
+        expect(cfg.log_file_path).toBe("/tmp/logs/vendorvert/logs");
+        //No extension, as real name is logs-YYYY-MM-DD.log (see logger.ts)
     })
 
 })
