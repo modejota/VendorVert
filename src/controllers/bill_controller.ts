@@ -195,8 +195,10 @@ export default async function billController(fastify: FastifyInstance) {
                 logger.info(`Product with ID ${params.idp} updated in invoice with ID ${params.id} successfully.`)
                 reply.status(200).send({result: `Product with ID ${params.idp} updated in invoice with ID ${params.id} successfully.`})
             } catch {
-                logger.error(`Product with ID ${params.idp} not found in invoice with ID ${params.id}.`)
-                reply.status(404).send({error: `Product with ID ${params.idp} not found in invoice with ID ${params.id}.`})
+                let product = handler.crear_producto(params.idp, data.nombre, data.marca, data.tipo, data.PVP)
+                handler.aniadir_producto_factura(params.id, product, data.cantidad)
+                logger.info(`Product with ID ${params.idp} added to invoice with ID ${params.id} successfully.`)
+                reply.status(201).send({result: `Product with ID ${params.idp} added to invoice with ID ${params.id} successfully.`})
             }
         }
     })

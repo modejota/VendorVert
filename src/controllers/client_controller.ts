@@ -107,8 +107,9 @@ export default async function clientController(fastify: FastifyInstance) {
                     reply.code(400).send({error: `Client with ID ${params.id} is not specified correctly.`})
                 }
             } catch {
-                logger.error(`Client with ID ${params.id} not found so it can't be modified.`)
-                reply.code(404).send({error: `Client with ID ${params.id} not found.`})
+                handler.aniadir_cliente(new Client(params.id, data.nombre, data.apellidos, data.email))
+                logger.info(`Client with ID ${params.id} created successfully.`)
+                reply.code(201).send({result: `Client with ID ${params.id} created successfully.`})
             }
         }
     })

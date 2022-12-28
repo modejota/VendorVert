@@ -38,20 +38,20 @@ A continuación, se detallan las rutas de la API, agrupadas por el verbo HTTP qu
 #### Verbo GET
 ---
 
-| URI		| Descripción						|
-| ---		| ---							|
-| / | Mostrar mensaje de bienvenida a la API
-| /status | Comprobar que la aplicación está en línea |
-| /products	| Obtención de todos los productos del almacén		|
-| /products/:id	| Obtención del producto con ID único id del almacén	|
-| /invoices	| Obtención de todas las facturas disponibles en el sistema			|
-| /invoices/:id	| Obtención de la factura con ID único id del sistema	|
-| /invoices/:id/client | Obtención del cliente de la factura con ID único id	|
-| /invoices/:id/product/:idp	| Obtención del producto con ID único idp de la factura con ID único id	|
-| /invoices/:id/total	|	Obtención del importe total de la factura con ID único id |
-| /clients    | Obtención de todos los clientes del sistema		|
-| /clients/:id | Obtención del cliente con ID único id del sistema	|
-| /clients/:id/invoices | Obtención de todas las facturas del cliente con ID único id	|
+| URI		| Descripción						| Codigos de estado |
+| ---		| ---							|   --- |
+| / | Mostrar mensaje de bienvenida a la API | 200 |
+| /status | Comprobar que la aplicación está en línea | 200 |
+| /products	| Obtención de todos los productos del almacén		| 200 |
+| /products/:id	| Obtención del producto con ID único id del almacén	| 200, 404 |
+| /invoices	| Obtención de todas las facturas disponibles en el sistema			| 200 |
+| /invoices/:id	| Obtención de la factura con ID único id del sistema	| 200, 404 |
+| /invoices/:id/client | Obtención del cliente de la factura con ID único id	| 200, 404 |
+| /invoices/:id/product/:idp	| Obtención del producto con ID único idp de la factura con ID único id	| 200, 404 |
+| /invoices/:id/total	|	Obtención del importe total de la factura con ID único id | 200, 404 |
+| /clients    | Obtención de todos los clientes del sistema		| 200 |
+| /clients/:id | Obtención del cliente con ID único id del sistema	| 200, 404 |
+| /clients/:id/invoices | Obtención de todas las facturas del cliente con ID único id	| 200, 404 |
 
 El verbo GET se utiliza para obtener información del servidor. En este caso, se utiliza para obtener información sobre los productos, facturas y clientes del sistema.
 
@@ -64,12 +64,12 @@ Este comportamiento no es arbitrario, sino que se fundamenta en dos motivos:
 #### Verbo POST
 ---
 
-| URI		| Descripción						|
-| ---		| ---							|
-| /products	| Creación/actualización del producto cuyo ID único sea el enviado en el cuerpo de la petición		|
-| /invoices	| Creación de la factura cuyo ID único sea el enviado en el cuerpo de la petición			|
-| /invoices/:id	| Creación del producto cuyo ID único sea el enviado en el cuerpo de la petición, en la factura con el ID único especificado en la URL |
-| /clients	| Creación del cliente cuyo ID único sea el enviado en el cuerpo de la petición		|
+| URI		| Descripción						| Codigos de estado |
+| ---		| ---							|  --- |
+| /products	| Creación/actualización del producto cuyo ID único sea el enviado en el cuerpo de la petición		|  201, 409 |
+| /invoices	| Creación de la factura cuyo ID único sea el enviado en el cuerpo de la petición			|  201, 404, 409 |
+| /invoices/:id	| Creación del producto cuyo ID único sea el enviado en el cuerpo de la petición, en la factura con el ID único especificado en la URL |  201, 404, 409 |
+| /clients	| Creación del cliente cuyo ID único sea el enviado en el cuerpo de la petición		| 201, 400, 409 |
 
 El verbo POST se utiliza, principalmente, para crear un nuevo recurso en el servidor. Opcionalmente, en algunas APIs, se puede utilizar para realizar modificaciones de un recurso ya existente, aunque esto se desaconseja, ya que el "estándar" nos dice que la operación POST no debe ser idempotente, es decir, que si se realiza la misma petición varias veces, el resultado no será el mismo. Para realizar modificaciones de un recurso ya existente, se utilizará el verbo PUT, que sí es idempotente. 
 
@@ -78,35 +78,37 @@ En un intento de seguir esta filosofía, en nuestro caso se decide que el intent
 #### Verbo PUT
 ---
 
-| URI		| Descripción						|
-| ---		| ---							|
-| /products/:id	| Modificación de los datos del producto con ID único especificado en la URL del almacén	|
-| /invoices/:id/product/:idp	| Modificación de los datos del producto con ID único idp en la factura con ID único id		|
-| /clients/:id	| Modificación de los datos del cliente con ID único id del sistema		|
+[ESTO LO TENGO QUE REVISAR EN CODIGO, POR EL 201]
+
+| URI		| Descripción						| Codigos de estado |
+| ---		| ---							| --- |
+| /products/:id	| Modificación de los datos del producto con ID único especificado en la URL del almacén	| 200, 201 |
+| /invoices/:id/product/:idp	| Modificación de los datos del producto con ID único idp en la factura con ID único id		| 200, 201 404 |
+| /clients/:id	| Modificación de los datos del cliente con ID único id del sistema		| 200, 201, 400 |
 
 Dado que los identificadores se pasan como parte de la URI, no es necesarios adjuntarlos en el cuerpo de la petición. 
 
-Como mencionábamos anteriormente, el verbo PUT si es idempotente. Por lo tanto, modificará aquellos recursos existentes, y de no existir los creará.
+El verbo PUT sí es idempotente, por lo que si se realiza la misma petición varias veces, el resultado será el mismo. En el caso de el recurso no exista, se creará a partir del ID de la URI y los datos enviados en el cuerpo de la petición. De existir, simplemente se modificarán los datos del recurso con los datos enviados.
 
 Nótese que no se dispone de un verbo PUT para modificar la fecha de una factura (la cual se genera automáticamente en el momento de su creación), ya que no tiene sentido modificarla. Para modificar el cliente de una factura se ha de utilizar el verbo PATCH, ya que no se trata de una modificación completa del recurso, sino de una modificación parcial.
 
 #### Verbo DELETE
 ---
 
-| URI		| Descripción						|
-| ---		| ---							|
-| /products/:id	| Borrado del producto con ID único id del almacén	|		|
-| /invoices/:id	| Borrado de la factura con ID único id del sistema	|
-| /invoices/:id/product/:idp	| Borrado del producto con ID único idp de la factura con ID único id	|
-| /clients/:id	| Borrado del cliente con ID único id del sistema	|
+| URI		| Descripción						| Códigos de estado	|
+| ---		| ---							| ---		|
+| /products/:id	| Borrado del producto con ID único id del almacén	|	200, 404	|
+| /invoices/:id	| Borrado de la factura con ID único id del sistema	| 200, 404	|
+| /invoices/:id/product/:idp	| Borrado del producto con ID único idp de la factura con ID único id	| 200, 404	|
+| /clients/:id	| Borrado del cliente con ID único id del sistema	| 200, 404	|
 
 #### Verbo PATCH
 ---
 
-| URI		| Descripción						|
-| ---		| ---							|
-| /products/:id	| Actualización de la cantidad del producto con ID único id del almacén	|		|
-| /invoices/:id/client	| Actualización del identificador del cliente en la factura con ID único id del sistema	|
-| /invoices/:id/product/:idp	| Actualización de la cantidad del producto con ID único idp de la factura con ID único id	|
+| URI		| Descripción						| Códigos de estado	|
+| ---		| ---							| ---		|
+| /products/:id	| Actualización de la cantidad del producto con ID único id del almacén	| 200, 404	|
+| /invoices/:id/client	| Actualización del identificador del cliente en la factura con ID único id del sistema	| 200, 404	|
+| /invoices/:id/product/:idp	| Actualización de la cantidad del producto con ID único idp de la factura con ID único id	| 200, 404	|
 
 El verbo PATCH es utilizado para realizar modificaciones parciales de un recurso. En nuestro caso, se utiliza para actualizar la cantidad de un producto en el almacén o en una factura, ya que entendemos que es la operación de modificación más común que se realizará sobre un producto. En caso de querer actualizar otros de sus datos, aunque sea de forma parcial, se utilizará el verbo PUT. En el caso de las facturas, se utiliza para actualizar el cliente de la misma, ya que no se trata de una modificación completa del recurso, sino de una modificación parcial. 

@@ -245,14 +245,14 @@ describe('Tests de la API REST', () => {
             expect(response.json()).toEqual({result: `Client with ID ${aClient.id} updated successfully.`})
         })
 
-        it ('Debería fallar al modificar un cliente (PUT) no existente', async () => {
+        it ('Debería crear un cliente no existente (PUT)', async () => {
             const response = await server.inject({
                 url: `/clients/${nonExistingID}`,
                 method: 'PUT',
                 payload: modifyingClientData,
             });
-            expect(response.statusCode).toBe(404);
-            expect(response.json()).toEqual({error: `Client with ID ${nonExistingID} not found.`})
+            expect(response.statusCode).toBe(201);
+            expect(response.json()).toEqual({result: `Client with ID ${nonExistingID} created successfully.`})
         })
 
         it ('Debería borrar un cliente (DELETE)', async () => {
@@ -471,10 +471,10 @@ describe('Tests de la API REST', () => {
             const response = await server.inject({
                 url: `/invoices/${aInvoice.id}/client`,
                 method: 'PATCH',
-                payload: {id: nonExistingID},
+                payload: {id: nonExistingID+1}, // +1 to avoid the same ID as the previous test, that created that client
             });
             expect(response.statusCode).toBe(404);
-            expect(response.json()).toEqual({error: `Client with ID ${nonExistingID} not found.`})
+            expect(response.json()).toEqual({error: `Client with ID ${nonExistingID+1} not found.`})
         })
         
 
