@@ -1,6 +1,6 @@
 {
   "name": "vendorvert",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Sistema de ayuda a la toma de decisiones para pequeños negocios.",
   "scripts": {
     "check": "tsc --noEmit",
@@ -11,8 +11,7 @@
     "coverage": "jest --coverage --no-cache",
     "postclean": "rm -rf dist && rm -rf docs/coverage",
     "docker:build": "docker build -t vendorvert .",
-    "docker:run:local": "docker run -e LOG_DIR=`pwd`/logs -e LOG_FILE=`logs.log` -t -v `pwd`:/app/test vendorvert",
-    "docker:run:ci": "docker run -e LOG_DIR=$LOG_DIR -e LOG_FILE=$LOG_FILE -t -v `pwd`:/app/test vendorvert"
+    "docker:run": "docker run -t -v `pwd`:/app/test modejota/vendorvert"
   },
   "repository": {
     "type": "git",
@@ -43,6 +42,7 @@
     "dotenv": "^16.0.3",
     "etcd3": "^1.1.0",
     "fastify": "^4.10.0",
+    "moment": "^2.29.4",
     "pino": "^8.7.0"
   }
 }
