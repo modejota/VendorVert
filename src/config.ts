@@ -24,6 +24,7 @@ class Configuration {
         this.init()
     }
 
+    // Async init as we need to wait for etcd values
     private async init() {
 
         (async () => {
