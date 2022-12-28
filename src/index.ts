@@ -11,3 +11,5 @@ app.listen( {port: cfg.fastify_port}, (err, address) => {
     console.log(`Server listening at ${address}`);
     logger.info(`Server listening at ${address}`);
 });
+
+// Listen method changed in fastify last version
