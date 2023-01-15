@@ -37,7 +37,7 @@ export abstract class APIValidators {
         required: ['id', 'idc'],
         properties: {
             id: { type: 'number', minimum: C.ID_INVALIDO+1 },
-            idc: { type: 'number', minimum: C.ID_INVALIDO+1 }
+            id_cliente: { type: 'number', minimum: C.ID_INVALIDO+1 }
         }
     }
 
@@ -76,6 +76,15 @@ export abstract class APIValidators {
             marca: { type: 'string', minLength: C.LON_MARCA_MIN, maxLength: C.LON_NOMBRE_MAX },
             tipo: { type: 'number', minimum: C.ID_INVALIDO },
             PVP: { type: 'number', minimum: C.ID_INVALIDO },
+            cantidad: { type: 'number', minimum: C.ID_INVALIDO }
+        }
+    }
+
+    static readonly ProductDataBill = {
+        type: 'object',
+        required: ['barcode','cantidad'],
+        properties: {
+            barcode: { type: 'number', minimum: C.ID_INVALIDO+1 },
             cantidad: { type: 'number', minimum: C.ID_INVALIDO }
         }
     }

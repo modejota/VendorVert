@@ -24,7 +24,7 @@
     static readonly LON_MARCA_MAX:number = 48
 
     /**
-     * Longitud mínima del nombre de un clienet
+     * Longitud mínima del nombre de un cliente
      */
     static readonly LON_NOMBRE_CLIENTE_MIN:number = 2
 
@@ -32,6 +32,16 @@
      * Longitud máxima del nombre de un cliente
      */
     static readonly LON_NOMBRE_CLIENTE_MAX:number = 32
+
+    /**
+     * Longitud mínima del apellido de un cliente
+     */
+    static readonly LON_APELLIDOS_CLIENTE_MIN:number = 3
+
+    /**
+      * Longitud máxima del nombre de un cliente
+      */
+    static readonly LON_APELLIDOS_CLIENTE_MAX:number = 48
 
     /**
      * Valor para representar IDs inválidos de productos
