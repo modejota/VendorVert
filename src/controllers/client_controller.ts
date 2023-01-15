@@ -1,9 +1,7 @@
 import { FastifyInstance } from "fastify";
-import { handler } from '../handler';
 import { APIValidators as APIV } from '../constants/api_validators';
-import { Client } from "../models/client";
-import { parseClientes } from "../utils/parsers";
-import { logger } from "../utils/logger";
+import { Constants as C } from "../constants/constants";
+import Client from "../models/client";
 
 export default async function clientController(fastify: FastifyInstance) {
 
@@ -11,8 +9,8 @@ export default async function clientController(fastify: FastifyInstance) {
         method: "GET",
         url: "/",
         handler: async function (request, reply) {
-            let clients = parseClientes(handler.get_all_clientes())
-            reply.status(200).send({clientes: clients})
+            let clients = await Client.find()
+            return reply.code(200).send(clients)
         }
     })
 
@@ -24,16 +22,95 @@ export default async function clientController(fastify: FastifyInstance) {
         },
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.params))
-            try {
-                let client = handler.obtener_cliente(data.id)
-                reply.code(200).send({cliente: client})
-            } catch {
-                logger.error(`Client with ID ${data.id} not found.`)
-                reply.code(404).send({error: `Client with ID ${data.id} not found.`})
-            }
+            const search = await Client.findOne({DNI: data.id})
+            if (!search)
+                return reply.code(404).send({error: `Client with DNI ${data.id} not found.`})
+            return reply.code(200).send(search)
+        }   
+    })
+
+    fastify.route({
+        method: "POST",
+        url: "/",
+        schema: {
+            body: APIV.ClientData
+        },
+        handler: async function (request, reply) {
+            let data = JSON.parse(JSON.stringify(request.body))
+
+            if (C.EMAIL_REGEX.test(data.email) == false)
+                return reply.code(400).send({error: `Invalid email format.`}) 
+            
+            let client = await Client.findOne({DNI: data.id})
+            if (client) 
+                return reply.code(409).send({error: `Client with DNI ${data.id} already exists.`})
+        
+            let new_client = new Client({
+                DNI: data.id,
+                nombre: data.nombre,
+                apellidos: data.apellidos,
+                email: data.email,
+            })
+            await new_client.save()
+            return reply.code(201).header('Location', `/clients/${data.id}`).send({message: `Client with DNI ${data.id} inserted into the database successfully.`})
+
         }
     })
 
+    fastify.route({
+        method: "DELETE",
+        url: "/:id",
+        schema: {
+            params: APIV.ClientID
+        },
+        handler: async function (request, reply) {
+            let data = JSON.parse(JSON.stringify(request.params))
+            let client = await Client.findOne({DNI: data.id})
+            if (!client)
+                return reply.code(404).send({error: `Client with DNI ${data.id} not found.`})
+            await Client.deleteOne({DNI: data.id})
+            return reply.code(200).send({message: `Client with DNI ${data.id} deleted from the database successfully.`})
+        }
+    })
+
+    fastify.route({
+        method: "PUT",
+        url: "/:id",
+        schema: {
+            params: APIV.ClientID,
+            body: APIV.ModifyingClientData
+        },
+        handler: async function (request, reply) {
+            let data = JSON.parse(JSON.stringify(request.params))
+            let body = JSON.parse(JSON.stringify(request.body))
+
+            if (C.EMAIL_REGEX.test(body.email) == false)
+            return reply.code(400).send({error: `Invalid email format.`}) 
+
+            let search = await Client.findOne({DNI: data.id})
+            if (!search) {
+                let client = new Client({
+                    DNI: data.id,
+                    nombre: body.nombre,
+                    apellidos: body.apellidos,
+                    email: body.email,
+                })
+                await client.save()
+                return reply.code(201).header('Location', `/clients/${data.id}`).send({message: `Client with DNI ${data.id} inserted into the database successfully.`})
+            }
+            await Client.updateOne({DNI: data.id}, {
+                nombre: body.nombre,
+                apellidos: body.apellidos,
+                email: body.email,
+            })
+            return reply.code(200).send({message: `Client with DNI ${data.id} updated successfully.`})
+        }
+    })
+
+
+
+
+    /*
     fastify.route({
         method: "GET",
         url: "/:id/invoices",
@@ -58,78 +135,6 @@ export default async function clientController(fastify: FastifyInstance) {
             }
         }
     })
-
-    fastify.route({
-        method: "POST",
-        url: "/",
-        schema: {
-            body: APIV.ClientData
-        },
-        handler: async function (request, reply) {
-            let data = JSON.parse(JSON.stringify(request.body))
-            try {
-                let client = new Client(data.id, data.nombre, data.apellidos, data.email)
-                try {
-                    handler.aniadir_cliente(client)
-                    logger.info(`Client with ID ${data.id} created successfully.`)
-                    reply.code(201).send({result: `Client with ID ${data.id} created successfully.`})
-                } catch {
-                    logger.error(`Client with ID ${data.id} already exists.`)
-                    reply.code(409).send({error: `Client with ID ${data.id} already exists.`})
-                }
-            } catch {
-                logger.error(`Client with ID ${data.id} is not specified correctly so it can't be created.`)
-                reply.code(400).send({error: `Client with ID ${data.id} is not specified correctly.`})
-
-            }
-        }
-    })
-
-    fastify.route({
-        method: "PUT",
-        url: "/:id",
-        schema: {
-            params: APIV.ClientID,
-            body: APIV.ModifyingClientData
-        },
-        handler: async function (request, reply) {
-            let params = JSON.parse(JSON.stringify(request.params))
-            let data = JSON.parse(JSON.stringify(request.body))
-            try {
-                let client = handler.obtener_cliente(params.id)
-                try {
-                    handler.eliminar_cliente(params.id)
-                    handler.aniadir_cliente(new Client(params.id, data.nombre, data.apellidos, data.email))
-                    logger.info(`Client with ID ${params.id} updated successfully.`)
-                    reply.code(200).send({result: `Client with ID ${params.id} updated successfully.`})
-                } catch {
-                    logger.error(`Client with ID ${data.id} is not specified correctly so it can't be created.`)
-                    reply.code(400).send({error: `Client with ID ${params.id} is not specified correctly.`})
-                }
-            } catch {
-                handler.aniadir_cliente(new Client(params.id, data.nombre, data.apellidos, data.email))
-                logger.info(`Client with ID ${params.id} created successfully.`)
-                reply.code(201).send({result: `Client with ID ${params.id} created successfully.`})
-            }
-        }
-    })
-        
-    fastify.route({
-        method: "DELETE",
-        url: "/:id",
-        schema: {
-            params: APIV.ClientID
-        },
-        handler: async function (request, reply) {
-            let data = JSON.parse(JSON.stringify(request.params))
-            try {
-                handler.eliminar_cliente(data.id)
-                reply.code(200).send({result: `Client with ID ${data.id} deleted successfully.`})
-            } catch {
-                logger.error(`Client with ID ${data.id} not found so it can't be deleted.`)
-                reply.code(404).send({error: `Client with ID ${data.id} not found.`})
-            }
-        }
-    })
+    */
 
 }
