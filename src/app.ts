@@ -1,6 +1,7 @@
-import fastify from "fastify";
-import router from "./router";
+import router from './router';
+import * as fastify from 'fastify';
 
-const server = fastify();
-server.register(router);
-export default server;
+
+const app = fastify.default({ logger: false });
+app.register(router)
+export default app;
