@@ -2,18 +2,23 @@ version: '3'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - mongodb
+    external_links:
+      - mongodb
     volumes:
-      - .:/app/test
+      - .:/app
+    ports:
+      - 3030:3030
 
   mongodb:
+    container_name: mongodb
     image: mongo:latest
-    ports:
-      - 27017:27017
     volumes:
-      - mongodb:/data/db
+      - ./data:/data/db
 
 volumes:
   app:

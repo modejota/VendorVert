@@ -14,7 +14,8 @@ COPY package*.json ./
 RUN npm ci && npm cache clean --force
 
 # Container for tests. Move to that directory
-WORKDIR /app/test
+WORKDIR /app
 
-# We will execute the tests
-ENTRYPOINT [ "npm", "run", "test" ]
+# We will start the app from here
+EXPOSE 3030
+ENTRYPOINT [ "npm", "run", "start" ]
