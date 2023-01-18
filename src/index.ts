@@ -4,7 +4,7 @@ import {logger} from './utils/logger'
 import app from './app'
 
 const start = async () => 
-    app.listen( {port: cfg.fastify_port}, (err, address) => {
+    app.listen( {port: cfg.fastify_port, host: '0.0.0.0'}, (err, address) => {
         if (err) {
             console.error(err);
             logger.error(err);
@@ -12,8 +12,7 @@ const start = async () =>
         }
         console.log(`Server listening at ${address}`);
         logger.info(`Server listening at ${address}`);
-        // Tiene que estar lanzada la base de datos de mongodb del docker-compose. Como está fuera del clúster usa localhost
-        mongoose.connect('mongodb://localhost:27017/vendorvert')
+        mongoose.connect('mongodb://mongodb:27017/vendorvert')
         .then(() => {
             logger.info('MongoDB connected...') 
             console.log('MongoDB connected...') })
