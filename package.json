@@ -5,14 +5,14 @@
   "scripts": {
     "check": "tsc --noEmit",
     "build": "tsc --build",
-    "start": "node dist/index.js",
+    "start": "ts-node src/index.ts",
     "clean": "tsc --build --clean",
-    "dev": "npm run build && npm run start",
+    "dev": "npx nodemon --watch src --exec ts-node src/index.ts",
     "test": "jest --detectOpenHandles --no-cache",
     "coverage": "jest --coverage --no-cache",
     "postclean": "rm -rf dist && rm -rf docs/coverage",
     "docker:build": "docker build -t vendorvert .",
-    "docker:run": "docker run -t -v `pwd`:/app/test modejota/vendorvert"
+    "docker:run": "docker run -t -v `pwd`:/app modejota/vendorvert"
   },
   "repository": {
     "type": "git",
@@ -45,6 +45,7 @@
     "fastify": "^4.10.0",
     "moment": "^2.29.4",
     "moongose": "^1.0.0",
-    "pino": "^8.7.0"
+    "pino": "^8.7.0",
+    "ts-node": "^10.9.1"
   }
 }
