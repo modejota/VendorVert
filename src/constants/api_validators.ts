@@ -37,7 +37,7 @@ export abstract class APIValidators {
         required: ['id', 'idc'],
         properties: {
             id: { type: 'number', minimum: C.ID_INVALIDO+1 },
-            id_cliente: { type: 'number', minimum: C.ID_INVALIDO+1 }
+            idc: { type: 'number', minimum: C.ID_INVALIDO+1 }
         }
     }
 
