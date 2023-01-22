@@ -46,6 +46,7 @@
     "moment": "^2.29.4",
     "moongose": "^1.0.0",
     "pino": "^8.7.0",
+    "pino-elasticsearch": "^6.3.0",
     "ts-node": "^10.9.1"
   }
 }
