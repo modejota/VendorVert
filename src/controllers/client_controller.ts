@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
-import { handler } from '../handler';
 import { APIValidators as APIV } from '../constants/api_validators';
-import { Client } from "../models/client";
-import { parseClientes } from "../utils/parsers";
+import { Constants as C } from "../constants/constants";
+import Bill from "../models/bill";
+import Client from "../models/client";
 import { logger } from "../utils/logger";
 
 export default async function clientController(fastify: FastifyInstance) {
@@ -11,8 +11,9 @@ export default async function clientController(fastify: FastifyInstance) {
         method: "GET",
         url: "/",
         handler: async function (request, reply) {
-            let clients = parseClientes(handler.get_all_clientes())
-            reply.status(200).send({clientes: clients})
+            let clients = await Client.find()
+            logger.info('All clients retrieved.')
+            return reply.code(200).send(clients)
         }
     })
 
@@ -24,39 +25,14 @@ export default async function clientController(fastify: FastifyInstance) {
         },
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.params))
-            try {
-                let client = handler.obtener_cliente(data.id)
-                reply.code(200).send({cliente: client})
-            } catch {
-                logger.error(`Client with ID ${data.id} not found.`)
-                reply.code(404).send({error: `Client with ID ${data.id} not found.`})
+            const search = await Client.findOne({DNI: data.id})
+            if (!search) {
+                logger.error(`Client with DNI ${data.id} not found.`)
+                return reply.code(404).send({error: `Client with DNI ${data.id} not found.`})
             }
-        }
-    })
-
-    fastify.route({
-        method: "GET",
-        url: "/:id/invoices",
-        schema: {
-            params: APIV.ClientID
-        },
-        handler: async function (request, reply) {
-            let ID = JSON.parse(JSON.stringify(request.params)).id
-            try {
-                let client = handler.obtener_cliente(ID)
-                let facturas = handler.get_all_facturas()
-                let bills = []
-                for (let factura of facturas) {
-                    if (factura[1].client.id == ID) {
-                        bills.push(factura)
-                    }
-                }
-                reply.code(200).send({facturas: bills})
-            } catch {
-                logger.error(`Client with ID ${ID} not found so no invoices can be retreived.`)
-                reply.code(404).send({error: `Client with ID ${ID} not found.`})
-            }
-        }
+            logger.info(`Client with DNI ${data.id} retrieved.`)
+            return reply.code(200).send(search)
+        }   
     })
 
     fastify.route({
@@ -67,21 +43,47 @@ export default async function clientController(fastify: FastifyInstance) {
         },
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.body))
-            try {
-                let client = new Client(data.id, data.nombre, data.apellidos, data.email)
-                try {
-                    handler.aniadir_cliente(client)
-                    logger.info(`Client with ID ${data.id} created successfully.`)
-                    reply.code(201).send({result: `Client with ID ${data.id} created successfully.`})
-                } catch {
-                    logger.error(`Client with ID ${data.id} already exists.`)
-                    reply.code(409).send({error: `Client with ID ${data.id} already exists.`})
-                }
-            } catch {
-                logger.error(`Client with ID ${data.id} is not specified correctly so it can't be created.`)
-                reply.code(400).send({error: `Client with ID ${data.id} is not specified correctly.`})
 
+            if (C.EMAIL_REGEX.test(data.email) == false) {
+                logger.error(`Invalid email format specified when trying to create a client.`)
+                return reply.code(400).send({error: `Invalid email format specified.`})
+            } 
+            
+            let client = await Client.findOne({DNI: data.id})
+            if (client) {
+                logger.error(`Client with DNI ${data.id} already exists.`)
+                return reply.code(409).send({error: `Client with DNI ${data.id} already exists.`})
             }
+        
+            let new_client = new Client({
+                DNI: data.id,
+                nombre: data.nombre,
+                apellidos: data.apellidos,
+                email: data.email,
+            })
+            await new_client.save()
+            logger.info(`Client with DNI ${data.id} inserted into the database successfully.`)
+            return reply.code(201).header('Location', `/clients/${data.id}`).send({message: `Client with DNI ${data.id} inserted into the database successfully.`})
+
+        }
+    })
+
+    fastify.route({
+        method: "DELETE",
+        url: "/:id",
+        schema: {
+            params: APIV.ClientID
+        },
+        handler: async function (request, reply) {
+            let data = JSON.parse(JSON.stringify(request.params))
+            let client = await Client.findOne({DNI: data.id})
+            if (!client) {
+                logger.error(`Client with DNI ${data.id} not found.`)
+                return reply.code(404).send({error: `Client with DNI ${data.id} not found.`})
+            }
+            await Client.deleteOne({DNI: data.id})
+            logger.info(`Client with DNI ${data.id} deleted from the database successfully.`)
+            return reply.code(200).send({message: `Client with DNI ${data.id} deleted from the database successfully.`})
         }
     })
 
@@ -93,42 +95,51 @@ export default async function clientController(fastify: FastifyInstance) {
             body: APIV.ModifyingClientData
         },
         handler: async function (request, reply) {
-            let params = JSON.parse(JSON.stringify(request.params))
-            let data = JSON.parse(JSON.stringify(request.body))
-            try {
-                let client = handler.obtener_cliente(params.id)
-                try {
-                    handler.eliminar_cliente(params.id)
-                    handler.aniadir_cliente(new Client(params.id, data.nombre, data.apellidos, data.email))
-                    logger.info(`Client with ID ${params.id} updated successfully.`)
-                    reply.code(200).send({result: `Client with ID ${params.id} updated successfully.`})
-                } catch {
-                    logger.error(`Client with ID ${data.id} is not specified correctly so it can't be created.`)
-                    reply.code(400).send({error: `Client with ID ${params.id} is not specified correctly.`})
-                }
-            } catch {
-                handler.aniadir_cliente(new Client(params.id, data.nombre, data.apellidos, data.email))
-                logger.info(`Client with ID ${params.id} created successfully.`)
-                reply.code(201).send({result: `Client with ID ${params.id} created successfully.`})
+            let data = JSON.parse(JSON.stringify(request.params))
+            let body = JSON.parse(JSON.stringify(request.body))
+            if (C.EMAIL_REGEX.test(body.email) == false) {
+                logger.error(`Invalid email format specified when trying to create a client.`)
+                return reply.code(400).send({error: `Invalid email format specified.`})
+            } 
+
+            let search = await Client.findOne({DNI: data.id})
+            if (!search) {
+                let client = new Client({
+                    DNI: data.id,
+                    nombre: body.nombre,
+                    apellidos: body.apellidos,
+                    email: body.email,
+                })
+                await client.save()
+                logger.info(`Client with DNI ${data.id} inserted into the database successfully.`)
+                return reply.code(201).header('Location', `/clients/${data.id}`).send({message: `Client with DNI ${data.id} inserted into the database successfully.`})
             }
+            await Client.updateOne({DNI: data.id}, {
+                nombre: body.nombre,
+                apellidos: body.apellidos,
+                email: body.email,
+            })
+            logger.info(`Client with DNI ${data.id} updated successfully.`)
+            return reply.code(200).send({message: `Client with DNI ${data.id} updated successfully.`})
         }
     })
-        
+
     fastify.route({
-        method: "DELETE",
-        url: "/:id",
+        method: "GET",
+        url: "/:id/invoices",
         schema: {
             params: APIV.ClientID
         },
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.params))
-            try {
-                handler.eliminar_cliente(data.id)
-                reply.code(200).send({result: `Client with ID ${data.id} deleted successfully.`})
-            } catch {
-                logger.error(`Client with ID ${data.id} not found so it can't be deleted.`)
-                reply.code(404).send({error: `Client with ID ${data.id} not found.`})
+            let client = await Client.findOne({DNI: data.id})
+            if (!client) {
+                logger.error(`Client with DNI ${data.id} not found.`)
+                return reply.code(404).send({error: `Client with DNI ${data.id} not found.`})
             }
+            let facturas = await Bill.find({clienteDNI: client.DNI})
+            logger.info(`All invoices from client with DNI ${data.id} retrieved.`)
+            return reply.code(200).send(facturas)
         }
     })
 

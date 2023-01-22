@@ -6,9 +6,6 @@ require('dotenv').config()
  * @public
  */
 class Configuration {
-    private _log_directory: any;
-    private _log_file: any;
-    private _log_file_extension: any;
     private _fastify_port: any;
     private readonly _etcd_client: Etcd3;
     
@@ -28,33 +25,6 @@ class Configuration {
     private async init() {
 
         (async () => {
-            this._log_directory = await this._etcd_client.get('LOG_DIR').string().catch(err =>{});
-        })();
-        if(this._log_directory == null && process.env.LOG_DIR != undefined) {
-            this._log_directory = process.env.LOG_DIR
-        } else {
-            this._log_directory = "/tmp/logs/vendorvert/"
-        }
-
-        (async () => {
-            this._log_file = await this._etcd_client.get('LOG_FILE').string().catch(err =>{});
-        })();
-        if(this._log_file == null && process.env.LOG_FILE != undefined) {
-            this._log_file = process.env.LOG_FILE
-        } else {
-            this._log_file = "logs"
-        }
-
-        (async () => {
-            this._log_file_extension = await this._etcd_client.get('LOG_FILE_EXTENSION').string().catch(err =>{});
-        })();
-        if(this._log_file_extension == null && process.env.LOG_FILE_EXTENSION != undefined) {
-            this._log_file_extension = process.env.LOG_FILE_EXTENSION
-        } else {
-            this._log_file_extension = ".json"
-        }
-
-        (async () => {
             this._fastify_port = await this._etcd_client.get('FASTIFY_PORT').number().catch(err =>{});
         })();
         if(this._fastify_port == null && process.env.FASTIFY_PORT != undefined) {
@@ -62,38 +32,6 @@ class Configuration {
         } else {
             this._fastify_port = 3030
         }
-    }
-
-    /**
-     * Método para obtener el directorio donde se almacenan los logs
-     * @returns Ruta del directorio donde se almacenan los logs
-     */
-    public get log_directory(): string {
-        return this._log_directory
-    }
-
-    /**
-     * Método para obtener el nombre del archivo donde se almacenan los logs
-     * @returns Nombre del archivo donde se almacenan los logs
-     */
-    public get log_file(): string { 
-        return this._log_file
-    }
-
-    /**
-     * Método para obtener la extensión del archivo donde se almacenan los logs
-     * @returns Extensión del archivo donde se almacenan los logs
-     */
-    public get log_file_extension(): string {
-        return this._log_file_extension
-    }
-
-    /**
-     * Método para obtener la ruta completa del fichero donde se almacenan los logs (sin extensión)
-     * @returns Ruta completa del fichero donde se almacenan los logs
-     */
-    public get log_file_path(): string {
-        return this.log_directory + this.log_file 
     }
 
     /**

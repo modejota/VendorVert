@@ -35,4 +35,6 @@ La documentación de este hito se encuentra en [esta carpeta](docs/hito4). En é
 
 La documentación de este hito se encuentra en [esta carpeta](docs/hito5). En él se describe la justificación de la elección de los microservicios: framework para la API REST, servicio de logging y servicio de configuración remota. También se describen las rutas de la API REST creada.
 
-:construction: **En construcción conforme avance la asignatura** :construction:
+## Hito 6. Composición de servicios.
+
+La documentación de este hito se encuentra en [esta carpeta](docs/hito6). En ella se puede encontrar la estructura del clúster, la explicación del fichero ``docker-compose``, los cambios que han sido necesarios realizar a la aplicación y una demostración de que todo funciona correctamente.

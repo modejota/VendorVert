@@ -80,6 +80,15 @@ export abstract class APIValidators {
         }
     }
 
+    static readonly ProductDataBill = {
+        type: 'object',
+        required: ['barcode','cantidad'],
+        properties: {
+            barcode: { type: 'number', minimum: C.ID_INVALIDO+1 },
+            cantidad: { type: 'number', minimum: C.ID_INVALIDO }
+        }
+    }
+
     /**
      * Comprobar que recibimos los campos necesarios para modificar un producto, ya sea en el almacen o en una factura
      */

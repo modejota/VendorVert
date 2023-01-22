@@ -1,94 +1,46 @@
-import { Constants } from "../constants/constants";
-import { ClientError } from "../errors/client_error";
+const mongoose = require('mongoose');
+import { Constants as C } from '../constants/constants';
 
-/**
- * Representación simplificada de un cliente.
- * Por simplicidad, no se incluye la dirección, el teléfono, la fecha de nacimiento, fecha de alta, etc.
- * @public
- */
-export class Client {
-    private _id: number;
-    private _nombre: string;
-    private _apellidos: string;
-    private _email: string;
+const productSchema = new mongoose.Schema({
+    DNI: {
+        type: Number,
+        required: true,
+        validate: {
+            validator: isNonNegative,
+            message: 'El DNI debe ser un número no negativo'
+        },
+    },
 
-    /**
-     * Constructor del objeto cliente
-     * @param id Identificador del cliente
-     * @param nombre Nombre del cliente
-     * @param apellidos Apellidos del cliente
-     * @param email Email del cliente
-     * @throws ClientError si alguno de los parámetros no es válido
-     */
+    nombre: {
+        type: String,
+        required: true,
+        minlenght: C.LON_NOMBRE_CLIENTE_MIN,
+        maxlenght: C.LON_NOMBRE_CLIENTE_MAX,
+    },
 
-    //Le faltan todas las validaciones, pero ni tan mal
-    constructor(id: number, nombre: string, apellidos: string, email: string) {
-        if (id <= Constants.ID_INVALIDO) {
-            throw new ClientError("Se intenta crear el cliente con un ID no válido");
-        }
-        this._id = id;
-        
-        if (!nombre) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} sin nombre `);
-        }
-        if (nombre.length < Constants.LON_NOMBRE_CLIENTE_MIN) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} con un nombre demasido corto `);
-        }
-        if (nombre.length > Constants.LON_NOMBRE_CLIENTE_MAX) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} con un nombre demasido largo `);
-        }
-        this._nombre = nombre;
-        
-        if (!apellidos) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} sin apellidos `);
-        }
-        if (apellidos.length < Constants.LON_NOMBRE_CLIENTE_MIN) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} con unos apellidos demasido cortos `);
-        }
-        if (apellidos.length > Constants.LON_NOMBRE_CLIENTE_MAX) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} con unos apellidos demasido largos `);
-        }
-        this._apellidos = apellidos;
-        
-        if(!email) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} sin email `);
-        }
-        if (Constants.EMAIL_REGEX.test(email) == false) {
-            throw new ClientError(` Se intentó crear un cliente con ID ${id} con un email no válido `);
-        }
-        this._email = email;
-    }
+    apellidos: {
+        type: String,
+        required: true,
+        minlenght: C.LON_APELLIDOS_CLIENTE_MIN,
+        maxlenght: C.LON_APELLIDOS_CLIENTE_MAX,
+    },
 
-     /**
-     * Devuelve el ID del cliente
-     * @returns ID del cliente
-     */
-    get id(): number {
-        return this._id;
-    }
+    email: {
+        type: String,
+        required: true,
+        validate: {
+            validator: isEmail,
+            message: 'El email no tiene un formato válido'
+        },
+    },
 
-    /**
-     * Devuelve el nombre del cliente
-     * @returns Nombre del cliente
-     */
-    get nombre(): string {
-        return this._nombre;
-    }
+}, {
+    timestamps: true,   // Adds createdAt and updatedAt. createdAt makes sense and may be useful, as it is the date of creation.
+    versionKey: false,
+});
 
-    /**
-     * Devuelve los apellidos del cliente
-     * @returns Apellidos del cliente
-     */
-    get apellidos(): string {
-        return this._apellidos;
-    }
+export default mongoose.model('Clients', productSchema);
 
-    /**
-     * Devuelve el email del cliente
-     * @returns Email del cliente
-     */
-    get email(): string {
-        return this._email;
-    }
+function isNonNegative(value: Number) { return value >= 0; }
+function isEmail(value: string) { return C.EMAIL_REGEX.test(value); }   // It is doubled-checked in the API.
 
-}

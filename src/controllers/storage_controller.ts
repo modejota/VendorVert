@@ -1,18 +1,19 @@
 import { FastifyInstance } from "fastify";
 import { APIValidators as APIV } from "../constants/api_validators";
-import { handler } from "../handler";
 import { ProductType } from "../models/product_type";
 import { logger } from "../utils/logger";
+import Product from "../models/product";
 
 export default async function storageController (fastify: FastifyInstance) {
 
     fastify.route({
         method: "GET",
         url: "/",
-        handler: async function (request, reply)  {
-            const result = Object.fromEntries(handler.get_all_productos_almacen())
-            reply.status(200).send(result)
-        }   
+        handler: async function (request, reply) {
+            const products = await Product.find()
+            logger.info('All products from storage retrieved')
+            return reply.code(200).send(products)
+        }
     })
 
     fastify.route({
@@ -23,13 +24,13 @@ export default async function storageController (fastify: FastifyInstance) {
         },
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.params))
-            try {
-                let product = handler.obtener_producto_almacen(data.id)
-                reply.code(200).send(product)
-            } catch {
-                logger.error(`Product with ID ${data.id} not found.`)
-                reply.code(404).send({error: `Product with ID ${data.id} not found.`})
+            const producto = await Product.findOne({barcode  : data.id})
+            if (!producto) {
+                logger.info(`Product with barcode ${data.id} not found`)
+                return reply.code(404).send({message: `Product with barcode ${data.id} not found`})
             }
+            logger.info(`Product with barcode ${data.id} retrieved`)
+            return reply.code(200).send(producto)
         }
     })
 
@@ -42,16 +43,44 @@ export default async function storageController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.body))
             data.tipo = data.tipo > ProductType.INDEFINIDO ? ProductType.INDEFINIDO : data.tipo;
-            try {
-                let product = handler.crear_producto(data.id, data.nombre, data.marca, data.tipo, data.PVP)
-                handler.aniadir_producto_almacen(product, data.cantidad)
-                reply.header("Location", `/products/${data.id}`)
-                logger.info(`Product with ID ${data.id} added successfully to storage.`)
-                reply.status(201).send({result: `Product with ID ${data.id} added successfully to storage.`})
-            } catch {
-                logger.error(`Product with ID ${data.id} already exists so it can'be added to storage.`)
-                reply.status(409).send({result: `Product with ID ${data.id} already exists.`})
+            data.cantidad = data.cantidad ? data.cantidad : 0;
+
+            const producto = await Product.findOne({barcode: data.id})
+            if (producto) {
+                logger.info(`Product with barcode ${data.id} already exists`)
+                return reply.code(409).send({message: `Product with barcode ${data.id} already exists`})
             }
+            let product = new Product({
+                barcode: data.id,
+                nombre: data.nombre,
+                marca: data.marca,
+                tipo: data.tipo,
+                PVP: data.PVP,
+                cantidad: data.cantidad
+            })
+            await product.save()
+            logger.info(`Product with barcode ${data.id} inserted into the storage successfully`)
+            return reply.header('Location', `/products/${data.id}`).code(201).send({message: `Product with barcode ${data.id} inserted into the storage successfully`})
+        }
+    })
+
+    fastify.route({
+        method: "DELETE",
+        url: "/:id",
+        schema: {
+            params: APIV.ProductID
+        },
+        handler: async function (request, reply) {
+            let data = JSON.parse(JSON.stringify(request.params))
+            
+            const search = await Product.findOne({barcode: data.id})
+            if (!search) {
+                logger.info(`Product with barcode ${data.id} not found`)
+                return reply.code(404).send({message: `Product with barcode ${data.id} not found`})
+            }
+            await Product.findOneAndDelete({barcode : data.id})
+            logger.info(`Product with barcode ${data.id} deleted successfully`)
+            return reply.code(200).send({message: 'Product deleted successfully'})
         }
     })
 
@@ -66,17 +95,30 @@ export default async function storageController (fastify: FastifyInstance) {
             let ID = JSON.parse(JSON.stringify(request.params)).id
             let data = JSON.parse(JSON.stringify(request.body))
             data.tipo = data.tipo > ProductType.INDEFINIDO ? ProductType.INDEFINIDO : data.tipo;
-            try {
-                let product = handler.crear_producto(ID, data.nombre, data.marca, data.tipo, data.PVP)
-                handler.actualizar_producto_almacen(product, data.cantidad)
-                logger.info(`Product with ID ${ID} updated successfully.`)
-                reply.status(200).send({result: `Product with ID ${ID} updated successfully.`})
-            } catch {
-                let product = handler.crear_producto(ID, data.nombre, data.marca, data.tipo, data.PVP)
-                handler.aniadir_producto_almacen(product, data.cantidad)
-                logger.info(`Product with ID ${ID} added successfully to storage as it didn't existed.`)
-                reply.header("Location", `/products/${ID}`)
-                reply.status(201).send({result: `Product with ID ${ID} added successfully to storage.`})
+            data.cantidad = data.cantidad ? data.cantidad : 0;
+            
+            const search = await Product.findOne({barcode: ID})
+            if (!search) {
+                let product = new Product({
+                    barcode: ID,
+                    nombre: data.nombre,
+                    marca: data.marca,
+                    tipo: data.tipo,
+                    PVP: data.PVP,
+                    cantidad: data.cantidad
+                })
+                await product.save()
+                logger.info(`Product with barcode ${ID} inserted into the storage successfully`)
+                return reply.header('Location', `/products/${ID}`).code(201).send({message: `Product with barcode ${ID} inserted into the storage successfully`})
+            } else {
+                await Product.findOneAndUpdate({barcode: ID}, {
+                    nombre: data.nombre,
+                    marca: data.marca,
+                    tipo: data.tipo,
+                    PVP: data.PVP
+                })
+                logger.info(`Product with barcode ${ID} updated successfully`)
+                return reply.code(200).send({message: `Product with barcode ${ID} updated successfully`})
             } 
         }
     })
@@ -87,37 +129,22 @@ export default async function storageController (fastify: FastifyInstance) {
         schema: {
             params: APIV.ProductID,
             body: APIV.QuantityOfAProductData
-        },
+        }, 
         handler: async function (request, reply) {
             let ID = JSON.parse(JSON.stringify(request.params)).id
             let new_quantity = JSON.parse(JSON.stringify(request.body)).cantidad
-            try {
-                handler.actualizar_cantidad_producto_almacen(ID, new_quantity)
-                logger.info(`Quantity available of product with ID ${ID} updated successfully.`)
-                reply.code(200).send({result: `Quantity available of product with ID ${ID} updated successfully.`})
-            } catch {
-                logger.error(`Product with ID ${ID} not found in storage so its quantity can't be updated.`)
-                reply.code(404).send({error: `Product with ID ${ID} not found.`})
-            }
-        }
-    })
 
-    fastify.route({
-        method: "DELETE",
-        url: "/:id",
-        schema: {
-            params: APIV.ProductID
-        },
-        handler: async function (request, reply) {
-            let ID = JSON.parse(JSON.stringify(request.params)).id
-            try {
-                handler.eliminar_producto_almacen(ID)
-                logger.info(`Product with ID ${ID} deleted successfully from storage.`)
-                reply.code(200).send({result: `Product with ID ${ID} deleted successfully.`})
-            } catch {
-                logger.error(`Product with ID ${ID} not found in storage so it can't be deleted.`)
-                reply.code(404).send({error: `Product with ID ${ID} not found.`})
+            const search = await Product.findOne({barcode: ID})
+            if (!search) {
+                logger.info(`Product with barcode ${ID} not found`)
+                return reply.code(404).send({message: `Product with barcode ${ID} not found`})
             }
+            
+            await Product.findOneAndUpdate({barcode: ID}, {
+                cantidad: new_quantity
+            })
+            logger.info(`Product with barcode ${ID} updated successfully`)
+            return reply.code(200).send({message: `Product with barcode ${ID} updated successfully`})
         }
     })
 
