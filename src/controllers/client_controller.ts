@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { APIValidators as APIV } from '../constants/api_validators';
 import { Constants as C } from "../constants/constants";
+import Bill from "../models/bill";
 import Client from "../models/client";
 
 export default async function clientController(fastify: FastifyInstance) {
@@ -107,10 +108,6 @@ export default async function clientController(fastify: FastifyInstance) {
         }
     })
 
-
-
-
-    /*
     fastify.route({
         method: "GET",
         url: "/:id/invoices",
@@ -118,23 +115,13 @@ export default async function clientController(fastify: FastifyInstance) {
             params: APIV.ClientID
         },
         handler: async function (request, reply) {
-            let ID = JSON.parse(JSON.stringify(request.params)).id
-            try {
-                let client = handler.obtener_cliente(ID)
-                let facturas = handler.get_all_facturas()
-                let bills = []
-                for (let factura of facturas) {
-                    if (factura[1].client.id == ID) {
-                        bills.push(factura)
-                    }
-                }
-                reply.code(200).send({facturas: bills})
-            } catch {
-                logger.error(`Client with ID ${ID} not found so no invoices can be retreived.`)
-                reply.code(404).send({error: `Client with ID ${ID} not found.`})
-            }
+            let data = JSON.parse(JSON.stringify(request.params))
+            let client = await Client.findOne({DNI: data.id})
+            if (!client)
+                return reply.code(404).send({error: `Client with DNI ${data.id} not found.`})
+            let facturas = await Bill.find({clienteDNI: client.DNI})
+            return reply.code(200).send(facturas)
         }
     })
-    */
 
 }

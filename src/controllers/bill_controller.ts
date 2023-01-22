@@ -77,6 +77,8 @@ export default async function billController (fastify: FastifyInstance) {
                         break
                     }
                 }
+                if (Object.keys(product_detailed).length === 0) 
+                    return reply.code(404).send({message: 'Product not found in the bill'})
                 return reply.code(200).send(product_detailed)
             }
         })
@@ -131,7 +133,7 @@ export default async function billController (fastify: FastifyInstance) {
             handler: async function (request, reply) {
                 let data = JSON.parse(JSON.stringify(request.body))
 
-                const searchClientExists = await Client.findOne({DNI: data.id_cliente})
+                const searchClientExists = await Client.findOne({DNI: data.idc})
                 if (!searchClientExists)
                     return reply.code(404).send({message: 'Client not found. Invoice not created'}) 
 
@@ -141,7 +143,7 @@ export default async function billController (fastify: FastifyInstance) {
                 
                 let bill = new Bill({
                     numFactura: data.id,
-                    clienteDNI: data.id_cliente,
+                    clienteDNI: data.idc,
                 })
                 await bill.save()
                 return reply.header('Location', `/invoices/${data.id}`).code(201).send({message: 'Bill inserted into the system successfully'})
@@ -241,7 +243,7 @@ export default async function billController (fastify: FastifyInstance) {
                 const searchBillExists = await Bill.findOne({numFactura: data.id})
                 if (!searchBillExists)
                     return reply.code(404).send({message: 'Bill not found, so it cannot be deleted'})
-                await Bill.delete({numFactura: data.id})
+                await Bill.deleteOne({numFactura: data.id})
                 return reply.code(200).send({message: 'Bill deleted successfully'})
             }
         })
