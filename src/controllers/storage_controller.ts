@@ -11,6 +11,7 @@ export default async function storageController (fastify: FastifyInstance) {
         url: "/",
         handler: async function (request, reply) {
             const products = await Product.find()
+            logger.info('All products from storage retrieved')
             return reply.code(200).send(products)
         }
     })
@@ -24,8 +25,11 @@ export default async function storageController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.params))
             const producto = await Product.findOne({barcode  : data.id})
-            if (!producto) 
-                return reply.code(404).send({message: 'Product not found'})
+            if (!producto) {
+                logger.info(`Product with barcode ${data.id} not found`)
+                return reply.code(404).send({message: `Product with barcode ${data.id} not found`})
+            }
+            logger.info(`Product with barcode ${data.id} retrieved`)
             return reply.code(200).send(producto)
         }
     })
@@ -42,9 +46,10 @@ export default async function storageController (fastify: FastifyInstance) {
             data.cantidad = data.cantidad ? data.cantidad : 0;
 
             const producto = await Product.findOne({barcode: data.id})
-            if (producto)
-                return reply.code(409).send({message: 'Product already exists'})
-
+            if (producto) {
+                logger.info(`Product with barcode ${data.id} already exists`)
+                return reply.code(409).send({message: `Product with barcode ${data.id} already exists`})
+            }
             let product = new Product({
                 barcode: data.id,
                 nombre: data.nombre,
@@ -54,7 +59,8 @@ export default async function storageController (fastify: FastifyInstance) {
                 cantidad: data.cantidad
             })
             await product.save()
-            return reply.header('Location', `/products/${data.id}`).code(201).send({message: 'Product inserted into the storage successfully'})
+            logger.info(`Product with barcode ${data.id} inserted into the storage successfully`)
+            return reply.header('Location', `/products/${data.id}`).code(201).send({message: `Product with barcode ${data.id} inserted into the storage successfully`})
         }
     })
 
@@ -68,10 +74,12 @@ export default async function storageController (fastify: FastifyInstance) {
             let data = JSON.parse(JSON.stringify(request.params))
             
             const search = await Product.findOne({barcode: data.id})
-            if (!search)
-                return reply.code(404).send({message: 'Product not found'})
-
+            if (!search) {
+                logger.info(`Product with barcode ${data.id} not found`)
+                return reply.code(404).send({message: `Product with barcode ${data.id} not found`})
+            }
             await Product.findOneAndDelete({barcode : data.id})
+            logger.info(`Product with barcode ${data.id} deleted successfully`)
             return reply.code(200).send({message: 'Product deleted successfully'})
         }
     })
@@ -100,7 +108,8 @@ export default async function storageController (fastify: FastifyInstance) {
                     cantidad: data.cantidad
                 })
                 await product.save()
-                return reply.header('Location', `/products/${ID}`).code(201).send({message: 'Product updated successfully'})
+                logger.info(`Product with barcode ${ID} inserted into the storage successfully`)
+                return reply.header('Location', `/products/${ID}`).code(201).send({message: `Product with barcode ${ID} inserted into the storage successfully`})
             } else {
                 await Product.findOneAndUpdate({barcode: ID}, {
                     nombre: data.nombre,
@@ -108,7 +117,8 @@ export default async function storageController (fastify: FastifyInstance) {
                     tipo: data.tipo,
                     PVP: data.PVP
                 })
-                return reply.code(200).send({message: 'Product updated successfully'})
+                logger.info(`Product with barcode ${ID} updated successfully`)
+                return reply.code(200).send({message: `Product with barcode ${ID} updated successfully`})
             } 
         }
     })
@@ -125,13 +135,16 @@ export default async function storageController (fastify: FastifyInstance) {
             let new_quantity = JSON.parse(JSON.stringify(request.body)).cantidad
 
             const search = await Product.findOne({barcode: ID})
-            if (!search)
-                return reply.code(404).send({message: 'Product not found'})
+            if (!search) {
+                logger.info(`Product with barcode ${ID} not found`)
+                return reply.code(404).send({message: `Product with barcode ${ID} not found`})
+            }
             
             await Product.findOneAndUpdate({barcode: ID}, {
                 cantidad: new_quantity
             })
-            return reply.code(200).send({message: 'Product updated successfully'})
+            logger.info(`Product with barcode ${ID} updated successfully`)
+            return reply.code(200).send({message: `Product with barcode ${ID} updated successfully`})
         }
     })
 
