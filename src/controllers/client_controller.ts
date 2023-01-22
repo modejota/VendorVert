@@ -97,8 +97,7 @@ export default async function clientController(fastify: FastifyInstance) {
         handler: async function (request, reply) {
             let data = JSON.parse(JSON.stringify(request.params))
             let body = JSON.parse(JSON.stringify(request.body))
-
-            if (C.EMAIL_REGEX.test(data.email) == false) {
+            if (C.EMAIL_REGEX.test(body.email) == false) {
                 logger.error(`Invalid email format specified when trying to create a client.`)
                 return reply.code(400).send({error: `Invalid email format specified.`})
             } 

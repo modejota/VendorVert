@@ -81,16 +81,21 @@ export default async function billController (fastify: FastifyInstance) {
                     if (bill.productos[i].barcode == data.idp) {
                         const product = await Product.findOne({barcode: bill.productos[i].barcode}, {barcode: 1, nombre: 1, marca: 1, PVP: 1})
                         if (!product) {
-                            logger.error(`Product with barcode ${bill.productos[i].barcode} not found while retrieving bill with id ${data.id}`)
-                            return reply.code(404).send({message: `Product with barcode ${bill.productos[i].barcode} not found while retrieving bill with id ${data.id}`})
+                            logger.error(`Product with barcode ${bill.productos[i].barcode} not found in the storage while retrieving bill with id ${data.id}`)
+                            return reply.code(404).send({message: `Product with barcode ${bill.productos[i].barcode} not found in the storage while retrieving bill with id ${data.id}`})
                         }
                         product.cantidad = bill.productos[i].cantidad
                         product_detailed = product
                         break
                     }
                 }
-                logger.info(`Product with barcode ${data.idp} retrieved from bill with id ${data.id}`)
-                return reply.code(200).send(product_detailed)
+                if (Object.keys(product_detailed).length !== 0) {
+                    logger.info(`Product with barcode ${data.idp} retrieved from bill with id ${data.id}`)
+                    return reply.code(200).send(product_detailed)
+                } else {
+                    logger.error(`Product with barcode ${data.idp} not found in bill with id ${data.id}`)
+                    return reply.code(404).send({message: `Product with barcode ${data.idp} not found in bill with id ${data.id}`})
+                }
             }
         })
 
