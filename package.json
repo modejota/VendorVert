@@ -11,8 +11,7 @@
     "test": "jest --detectOpenHandles --no-cache",
     "coverage": "jest --coverage --no-cache",
     "postclean": "rm -rf dist && rm -rf docs/coverage",
-    "docker:build": "docker build -t vendorvert .",
-    "docker:run": "docker run -t -v `pwd`:/app modejota/vendorvert"
+    "docker:build": "docker build -t vendorvert ."
   },
   "repository": {
     "type": "git",
