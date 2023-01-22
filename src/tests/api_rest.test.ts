@@ -369,7 +369,6 @@ describe('Tests de la API REST', () => {
         })
 
         it ('Debería obtener el importe total de una factura (GET)', async () => {
-            let expectedTotal = 1499 
             const response = await server.inject({
                 url: `/invoices/${aInvoice.id}/total`,
                 method: 'GET',
